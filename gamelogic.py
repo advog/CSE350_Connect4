@@ -5,18 +5,16 @@ def check_valid(board, column):
     return value
 
 def upadate_board(board, column, turn):
+    if(turn%2 == 1):
+        player_value = 1
+    else:
+        player_value = 2
     for row in range(0,6):
         if(board[column][row] != 0):
-            if(turn%2 == 1):
-                board[column][row-1] = 1
-            else:
-                board[column][row-1] = 2
+            board[column][row-1] = player_value
             return
-        elif(row == 6):
-            if(turn%2 == 1):
-                board[column][row] = 1
-            else:
-                board[column][row] = 2
+        elif(row == 5):
+            board[column][row-1] = player_value
             return
 
 def check_win(board, turn, start_column):
@@ -108,15 +106,3 @@ def check_win(board, turn, start_column):
             break
         row += 1
         column += 1
-
-
-#Input: board, turn, column
-# Use modulo to get player value = PV
-#Checking column/down
-#   Go until != 0, PV, count the number the matches PV until != to PV or count = 4
-#Checking row/across
-#   Go Left until != PV or column = 0 or count = 4, return to column go right until != PV or column = 5 or count = 4
-#Checking Positive diagonal
-#   Go Left & down until != PV or column = 0 or row = 5 or count = 4, return to column go right & up until != PV or column = 5 or row = 0 or count = 4
-#Checking Positive diagonal
-# Go Left & up until != PV or column = 0 or row = 0 or count = 4, return to column go right & down until != PV or column = 5 or row = 5 or count = 4
