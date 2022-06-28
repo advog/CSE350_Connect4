@@ -22,6 +22,7 @@ def check_win(board, turn, start_column):
         player_value = 1
     else:
         player_value = 2
+    next_turn = 0
     win = 1
     tie = 2
     start_row = 0
@@ -106,3 +107,7 @@ def check_win(board, turn, start_column):
             break
         row += 1
         column += 1
+    if(turn == 42):
+        return tie
+    else:
+        return next_turn
