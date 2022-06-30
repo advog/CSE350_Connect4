@@ -11,22 +11,23 @@ Red = (255,0,0)
 Yellow = (255,255,0)
 currColor = Red
 
-board = [[0]*6 for i in range(7)]
+board = [[0]*7 for i in range(6)]
 
 display_surface = pygame.display.set_mode((X, Y))
 pygame.display.set_caption('Ultimate Connect 4')
 
-pieces = [[None]*6 for i in range(7)]
+pieces = [[None]*7 for i in range(6)]
 
+#Switched row and col
 def drawGrid():
     blockSize = 100 #Set the size of the grid block
     circleSize = 40
-    for x in range(7):
-        for y in range(6):
-            rect = pygame.Rect(x*blockSize, y*blockSize,
+    for x in range(6):
+        for y in range(7):
+            rect = pygame.Rect(y*blockSize, x*blockSize,
                                blockSize, blockSize)
             pygame.draw.rect(display_surface, (255,255,255), rect, 1)
-            pieces[x][y]=((x*blockSize+50,y*blockSize+50), circleSize,0)
+            pieces[x][y]=((y*blockSize+50,x*blockSize+50), circleSize,0)
             pygame.draw.circle(display_surface,emptyColor,pieces[x][y][0], pieces[x][y][1],pieces[x][y][2])
 
 # infinite loop
@@ -37,12 +38,13 @@ drawGrid()
 def addPiece(col, color):
     row = -1
     for i in range(6):
-        if(board[col][i]==0):
+        if(board[i][col]==0):
             row = i
     if(row==-1):
         return
-    board[col][row]=1
-    pygame.draw.circle(display_surface, color, pieces[col][row][0], pieces[col][row][1], pieces[col][row][2])
+    board[row][col]=1
+    tempPiece=pieces[row][col]
+    pygame.draw.circle(display_surface, color, tempPiece[0], tempPiece[1], tempPiece[2])
 
 def switchColor(color):
     if color == Red:
