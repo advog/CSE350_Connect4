@@ -87,7 +87,7 @@ def check_win(board, turn, start_column):
     count = 0
     row = start_row
     column = start_column
-    while(row > -1 and column > -1):
+    while(column > -1 and row > -1):
         if(board[column][row] == player_value):
             count += 1
             if(count == 4):
@@ -96,7 +96,7 @@ def check_win(board, turn, start_column):
             break
         row -= 1
         column -= 1
-    row = start_row - 1
+    row = start_row + 1
     column = start_column + 1
     while(row < 6  and column < 7):
         if(board[column][row] == player_value):
