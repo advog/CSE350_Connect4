@@ -1,9 +1,10 @@
 import pygame
-
+import c4tools
 pygame.init()
-# assigning values to width and height variable
-X = 700
-Y = 600
+
+# Globals
+Xmax = 1400
+Ymax= 1200
 
 emptyColor = (1,0,60)
 Red = (255,0,0)
@@ -11,19 +12,59 @@ Yellow = (255,255,0)
 currColor = Red
 turn = 1
 
-
-display_surface = pygame.display.set_mode((X, Y))
-pygame.display.set_caption('Ultimate Connect 4')
 board = [[0]*6 for i in range(7)]
 pieces = [[None]*6 for i in range(7)]
 
+#initialize display_surface
+display_surface = pygame.display.set_mode((Xmax, Ymax))
+pygame.display.set_caption('Ultimate Connect 4')
+
+#initialize additional surfaces
+game_surface = pygame.Surface((Xmax, Ymax))
+menu_surface = pygame.Surface((Xmax, Ymax))
+game_surface.fill((2, 0, 115))
+menu_surface.fill((2, 0, 115))
+
+#Menu Buttons
+PvP = c4tools.Button((Xmax/2-250, Ymax - 200), "Player vs Player", menu_surface)
+OPvP = c4tools.Button((Xmax/2-250, Ymax - 100), "Online PvP", menu_surface)
+PvAI = c4tools.Button((Xmax/2+100, Ymax - 200), "Player vs AI", menu_surface)
+AIvAI = c4tools.Button((Xmax/2+100, Ymax - 100), "AI vs AI", menu_surface)
+logo = pygame.image.load('logo2.png')
+
 # returns int representing gamemode chosen by player
 def start_menu():
-    return 0
+
+    PvP.show()
+    OPvP.show()
+    PvAI.show()
+    AIvAI.show()
+    menu_surface.blit(logo, (20, 20))
+    display_surface.blit(menu_surface, (0,0))
+    pygame.display.flip()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            PvP.process()
+            OPvP.process()
+            PvAI.process()
+            AIvAI.process()
+        if PvP.triggered:
+            return 0
+        elif OPvP.triggered:
+            return 1
+        elif PvAI.triggered:
+            return 2
+        elif AIvAI.triggered:
+            return 3
+
 
 
 # main loop
 def main():
+    drawGrid()
     while (True):
         gamemode_choice = start_menu()
         # clear or delete the screen
@@ -37,15 +78,16 @@ def main():
             cvc_mode()
 
 def drawGrid():
-    blockSize = 100 #Set the size of the grid block
-    circleSize = 40
+    blockSize = Xmax/7 #Set the size of the grid block
+    circleSize = (Xmax/700)*40
+    stepSize = (Xmax/700)*50
     for x in range(7):
         for y in range(6):
             rect = pygame.Rect(x*blockSize, y*blockSize,
                                blockSize, blockSize)
-            pygame.draw.rect(display_surface, (255,255,255), rect, 1)
-            pieces[x][y]=((x*blockSize+50,y*blockSize+50), circleSize,0)
-            pygame.draw.circle(display_surface,emptyColor,pieces[x][y][0], pieces[x][y][1],pieces[x][y][2])
+            pygame.draw.rect(game_surface, (255,255,255), rect, 1)
+            pieces[x][y]=((x*blockSize+stepSize,y*blockSize+stepSize), circleSize,0)
+            pygame.draw.circle(game_surface,emptyColor,pieces[x][y][0], pieces[x][y][1],pieces[x][y][2])
 
 # waits until the player inputs move
 def request_move_player():
@@ -78,10 +120,9 @@ def request_move_player():
 # begins pvp mode gameloop
 def pvp_mode():
     # stuff to display gameboard goes here
+    display_surface.blit(game_surface, (0,0))
+    pygame.display.flip()
 
-    # initialize board here
-    display_surface.fill((2, 0, 115))
-    drawGrid()
     turn = 1
     winner = -1
 
