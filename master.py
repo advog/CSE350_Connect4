@@ -5,28 +5,6 @@ screen = pygame.display.set_mode((1000, 1000))
 screen.fill((2, 0, 115))
 
 
-class Button:
-    def __init__(self, pos, text, event):
-        self.x, self.y = pos
-        self.font = pygame.font.SysFont("Calibri", 20)
-        self.text = self.font.render(text, 1, (0, 0, 0))
-        self.size = self.text.get_size()
-        self.surface = pygame.Surface((150, 40))
-        self.surface.fill(pygame.Color('grey27'))
-        self.surface.blit(self.text, ((150 - self.size[0]) / 2, (40 - self.size[1]) / 2))
-        self.rect = pygame.Rect(self.x, self.y, 150, 40)
-        self.event = event
-
-    def show(self):
-        screen.blit(self.surface, (self.x, self.y))
-
-    def process(self):
-        mousePos = pygame.mouse.get_pos()
-        if self.rect.collidepoint(mousePos):
-            if pygame.mouse.get_pressed(num_buttons=3)[0]:
-                self.event()
-
-
 # returns int representing gamemode chosen by player
 def start_menu():
     return 0
@@ -80,6 +58,7 @@ def pvp_mode():
     # stuff to display gameboard goes here
 
     # initialize board here
+
     turn = 0
     winner = -1
 
