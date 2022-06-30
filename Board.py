@@ -51,11 +51,8 @@ def switchColor(color):
     else:
         return Red
 
-def switchTurn(turn):
-    if(turn==1):
-        return 2
-    else:
-         return 1
+def switchTurn(curr_turn):
+    return curr_turn+1
 
 
 def request_move_player():
