@@ -13,35 +13,36 @@ Yellow = (255,255,0)
 currColor = Red
 turn = 1
 
-board = [[0]*7 for i in range(6)]
+board = [[0]*6 for i in range(7)]
 
 display_surface = pygame.display.set_mode((X, Y))
 pygame.display.set_caption('Ultimate Connect 4')
 
-pieces = [[None]*7 for i in range(6)]
+pieces = [[None]*6 for i in range(7)]
 
 #Switched row and col
 def drawGrid():
     blockSize = 100 #Set the size of the grid block
     circleSize = 40
-    for x in range(6):
-        for y in range(7):
-            rect = pygame.Rect(y*blockSize, x*blockSize,
+    for x in range(7):
+        for y in range(6):
+            rect = pygame.Rect(x*blockSize, y*blockSize,
                                blockSize, blockSize)
             pygame.draw.rect(display_surface, (255,255,255), rect, 1)
-            pieces[x][y]=((y*blockSize+50,x*blockSize+50), circleSize,0)
+            pieces[x][y]=((x*blockSize+50,y*blockSize+50), circleSize,0)
             pygame.draw.circle(display_surface,emptyColor,pieces[x][y][0], pieces[x][y][1],pieces[x][y][2])
 
 
 def addPiece(col, color):
     row = -1
     for i in range(6):
-        if(board[i][col]==0):
+        if(board[col][i]==0):
             row = i
     if(row==-1):
         return
-    board[row][col]= turn
-    tempPiece=pieces[row][col]
+    board[col][row]= turn
+    print(board)
+    tempPiece=pieces[col][row]
     pygame.draw.circle(display_surface, color, tempPiece[0], tempPiece[1], tempPiece[2])
 
 def switchColor(color):
@@ -100,9 +101,10 @@ while True:
     #print("past")
     addPiece(col, currColor)
     currColor = switchColor(currColor)
+    print("turn {}", turn)
+    print("win {}", gamelogic.check_win(board, turn, col))
     turn = switchTurn(turn)
-    print("turn {}",turn)
-    print(gamelogic.check_win(board, turn, col))
+
     for event in pygame.event.get():
         #key listener
         """
