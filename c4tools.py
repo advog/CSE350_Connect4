@@ -21,3 +21,23 @@ class Button:
         if self.rect.collidepoint(mousePos):
             if pygame.mouse.get_pressed(num_buttons=3)[0]:
                 self.triggered = 1
+
+class Label:
+    def __init__(self, pos, text, dispSurf):
+        self.x, self.y = pos
+        self.font = pygame.font.SysFont("Calibri", 40)
+        self.text = self.font.render(text, 1, pygame.Color("white"))
+        self.size = self.text.get_size()
+        self.surface = pygame.Surface((700, 100))
+        self.surface.fill((2,0,115))
+        self.surface.blit(self.text, ((700-self.size[0])/2, (100-self.size[1])/2))
+        self.rect = pygame.Rect(self.x, self.y, 700, 200)
+        self.dispSurf = dispSurf
+
+    def change(self, text):
+        self.font = pygame.font.SysFont("Calibri", 40)
+        self.text = self.font.render(text, 1, pygame.Color("white"))
+        self.surface.blit(self.text, ((700-self.size[0])/2, (100-self.size[1])/2))
+
+    def show(self):
+        self.dispSurf.blit(self.surface, (self.x, self.y))

@@ -1,8 +1,18 @@
 def check_valid(board, column):
-    value = False
-    if(board[column][0] == 0):
+    if(column == -1):
+        value = False
+    elif(board[column][get_open_row(board, column)][1] == 0):
         value = True
+    else:
+        value = False
     return value
+
+def get_open_row(board, col):
+    row = -1
+    for i in range(6):
+        if(board[col][i][1]==0):
+            row = i
+    return row
 
 def upadate_board(board, column, turn):
     if(turn%2 == 1):
@@ -10,7 +20,7 @@ def upadate_board(board, column, turn):
     else:
         player_value = 2
     for row in range(0,6):
-        if(board[column][row] != 0):
+        if(board[column][row][1] != 0):
             board[column][row-1] = player_value
             return
         elif(row == 5):
@@ -30,15 +40,15 @@ def check_win(board, turn, start_column):
 
     # Checking Down Win
     for row in range(0,6):
-        if(board[start_column][row] == player_value):
+        if(board[start_column][row][1] == player_value):
             if(count == 0):
                 start_row = row
             count += 1
             if(count == 4):
                 return win
-        elif(board[start_column][row] == 0):
+        elif(board[start_column][row][1] == 0):
             continue
-        elif(board[start_column][row] != player_value):
+        elif(board[start_column][row][1] != player_value):
             break
 
     # Checking Across Win
@@ -57,13 +67,13 @@ def check_win(board, turn, start_column):
                 return win
         else:
             break
-    
+
     #Checking Positive Diagonal Win
     count = 0
     row = start_row
     column = start_column
     while(row < 6 and column > -1):
-        if(board[column][row] == player_value):
+        if(board[column][row][1] == player_value):
             count += 1
             if(count == 4):
                 return win
@@ -74,7 +84,7 @@ def check_win(board, turn, start_column):
     row = start_row - 1
     column = start_column + 1
     while(row > -1  and column < 7):
-        if(board[column][row] == player_value):
+        if(board[column][row][1] == player_value):
             count += 1
             if(count == 4):
                 return win
@@ -88,7 +98,7 @@ def check_win(board, turn, start_column):
     row = start_row
     column = start_column
     while(column > -1 and row > -1):
-        if(board[column][row] == player_value):
+        if(board[column][row][1] == player_value):
             count += 1
             if(count == 4):
                 return win
@@ -99,7 +109,7 @@ def check_win(board, turn, start_column):
     row = start_row + 1
     column = start_column + 1
     while(row < 6  and column < 7):
-        if(board[column][row] == player_value):
+        if(board[column][row][1] == player_value):
             count += 1
             if(count == 4):
                 return win
