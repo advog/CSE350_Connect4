@@ -1,14 +1,18 @@
 import pygame
+import random
+import os
 
 import button
 import gamelogic
 
+#initiate pygame
 pygame.init()
 
 # Dimension globals
 Xmax = 700
 Ymax = 700
 circle_size = (Xmax/700)*40
+blockSize = Xmax/7
 
 # color globals
 empty_color = (1, 0, 60)
@@ -24,113 +28,77 @@ pygame.display.set_caption('Ultimate Connect 4')
 #load assets
 logo = pygame.image.load('logo.png')
 
-#most recent game list, this is a placeholder
+#most recent game list, this is a placeholder for eventually storing and recalling games in files
 rewatch_list = []
 
 
-
-# initialize game_surface surfaces
+# initialize game_surface
 game_surface = pygame.Surface((Xmax, Ymax))
-def update_game_surface():
-    display_surface.blit(game_surface, (0, 0))
-    pygame.display.flip()
 
-# initialize menu_surface
+#add buttons to game_surface
+column_buttons = []
+for i in range(7):
+    tmp_button = button.invisible_button((blockSize * i, 100), (blockSize, 600))
+    column_buttons.append(tmp_button)
+
+#add textbox to game_surface (it is technically a click button but we just will never check if it is clicked)
+game_textbox = button.click_button((0, 0), (700, 100), menu_color, "Textbox", game_surface)
+
+
+#initialize menu surface
 menu_surface = pygame.Surface((Xmax, Ymax))
-def update_menu_surface():
+menu_surface.fill(menu_color)
+menu_surface.blit(logo, (0, 0))
+
+#add buttons to menu_surface
+menu_buttons = []
+lpvp_button = button.click_button((Xmax/2-130,500),(120,50),button_color, "Local PvP", menu_surface)
+menu_buttons.append(lpvp_button)
+opvp_button = button.click_button((Xmax/2 +10, 500), (120, 50), button_color, "Online PvP", menu_surface)
+menu_buttons.append(opvp_button)
+aivp_button = button.click_button((Xmax/2-130, 560), (120, 50), button_color, "PvAI", menu_surface)
+menu_buttons.append(aivp_button)
+aivai_button = button.click_button((Xmax/2 +10, 560), (120, 50), button_color, "AIvAI", menu_surface)
+menu_buttons.append(aivai_button)
+rewatch_button = button.click_button((Xmax / 2 -60, 620), (120, 50), button_color, "Rewatch", menu_surface)
+menu_buttons.append(rewatch_button)
+
+#dict for readability (if this were c++ I could just #define these)
+menu_button_dict = {"lpvp": 0, "opvp": 1, "aivp": 2, "aivai": 3, "rewatch": 4}
+
+
+#draws all buttons in a list
+#args: [] button_list
+def draw_buttons(button_list):
+    for b in button_list:
+        b.draw()
+
+#args: [] button_list, (x,y) pos
+#return: index of first button clicked in list
+def check_clicked_buttons(button_list, pos):
+    for i in range(len(button_list)):
+        if button_list[i].check_clicked(pos):
+            return i
+    return -1
+
+
+#draws menu_surface buttons onto menu_surface
+def draw_buttons_menu_surface():
+    draw_buttons(menu_buttons)
+
+#displays menu_surface on the display_surface
+def display_menu_surface():
     display_surface.blit(menu_surface, (0, 0))
     pygame.display.flip()
 
 
-# loops until the player chooses a gamemode by clicking on a button, returns an int indicating the button clicked
-def start_menu():
-    menu_surface.fill(menu_color)
-    menu_surface.blit(logo, (0, 0))
+#draws game_surface buttons onto game_surface
+def draw_buttons_game_surface():
+    game_textbox.draw()
 
-    lpvp_button = button.click_button((Xmax/2-130,500),(120,50),button_color, "Local PvP")
-    lpvp_button.draw(menu_surface)
-
-    opvp_button = button.click_button((Xmax/2 +10, 500), (120, 50), button_color, "Online PvP")
-    opvp_button.draw(menu_surface)
-
-    aivp_button = button.click_button((Xmax/2-130, 560), (120, 50), button_color, "PvAI")
-    aivp_button.draw(menu_surface)
-
-    aivai_button = button.click_button((Xmax/2 +10, 560), (120, 50), button_color, "AIvAI")
-    aivai_button.draw(menu_surface)
-
-    rewatch_button = button.click_button((Xmax / 2 -60, 620), (120, 50), button_color, "Rewatch")
-    rewatch_button.draw(menu_surface)
-
-    update_menu_surface()
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                pos = pygame.mouse.get_pos()
-                if lpvp_button.check_clicked(pos):
-                    return 0
-                if opvp_button.check_clicked(pos):
-                    return 1
-                if aivp_button.check_clicked(pos):
-                    return 2
-                if aivai_button.check_clicked(pos):
-                    return 3
-                if rewatch_button.check_clicked(pos):
-                    return 4
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-
-
-# main loop, calls start menu to get a gamemode from the player then begins the chosen gamemode
-def main():
-    while (True):
-        gamemode_choice = start_menu()
-        if (gamemode_choice == 0):
-            localPvP()
-        elif (gamemode_choice == 1):
-            onlinePvP()
-        elif (gamemode_choice == 2):
-            localPvAI()
-        elif (gamemode_choice == 3):
-            localAIvAI()
-        elif (gamemode_choice == 4):
-            rewatch()
-
-
-#loops until player returns move
-def request_move_player(button_list):
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                pos = pygame.mouse.get_pos()
-                for i in range(7):
-                    if( button_list[i].check_clicked(pos)):
-                        return i
-
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_1 or event.key == 49:
-                    return 0
-                if event.key == pygame.K_2 or event.key == 50:
-                    return 1
-                if event.key == pygame.K_3 or event.key == 51:
-                    return 2
-                if event.key == pygame.K_4 or event.key == 52:
-                    return 3
-                if event.key == pygame.K_5 or event.key == 53:
-                    return 4
-                if event.key == pygame.K_6 or event.key == 54:
-                    return 5
-                if event.key == pygame.K_7 or event.key == 55:
-                    return 6
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-
-
-#board is [][], draws board onto game_surface
-def draw_board(board):
+#draws board onto game_surface
+#args: [][] board
+def draw_board_game_surface(board):
     blockSize = Xmax / 7  # Set the size of the grid block
     stepSize = (Xmax / 700) * 50
     for x in range(7):
@@ -143,13 +111,65 @@ def draw_board(board):
             elif(board[x][y] == 2): color = player2_color
             pygame.draw.circle(game_surface, color, xy_offset, circle_size)
 
+#displays game_surface on the display_surface
+def display_game_surface():
+    display_surface.blit(game_surface, (0,0))
+    pygame.display.flip()
 
-#mutates the button_list to contain a list of inivisible buttons whose index maps to columns
-def create_column_buttons(button_list):
-    blockSize = Xmax / 7
-    for i in range(7):
-        tmp_button = button.invisible_button((blockSize*i, 100), (blockSize, 600))
-        button_list.append(tmp_button)
+
+#loops until the player chooses a gamemode by clicking on a button
+#returns: int indicating which button was clicked
+def start_menu():
+    draw_buttons_menu_surface()
+    display_menu_surface()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                pos = pygame.mouse.get_pos()
+                clicked_index = check_clicked_buttons(menu_buttons, pos)
+                if clicked_index != -1:
+                    return clicked_index
+
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+# main loop, calls start menu to get an int indicating gamemode from the player then begins the chosen gamemode
+def main():
+    while (True):
+        gamemode_choice = start_menu()
+        if (gamemode_choice == menu_button_dict["lpvp"]):
+            localPvP()
+        elif (gamemode_choice == menu_button_dict["opvp"]):
+            onlinePvP()
+        elif (gamemode_choice == menu_button_dict["aivp"]):
+            PvAI()
+        elif (gamemode_choice == menu_button_dict["aivai"]):
+            AIvAI()
+        elif (gamemode_choice == menu_button_dict["rewatch"]):
+            rewatch()
+
+
+#loops until player returns move
+#returns: int indicating column chosen by player
+def request_move_player():
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                pos = pygame.mouse.get_pos()
+                ret = check_clicked_buttons(column_buttons, pos)
+                if ret != -1:
+                    return ret
+
+            #event.key 49-55 map to the number keys 1-7
+            if event.type == pygame.KEYDOWN:
+                if 49 <= event.key <= 55:
+                    return event.key - 49
+
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
 
 # begins local pvp mode gameloop
 def localPvP():
@@ -160,29 +180,28 @@ def localPvP():
     #empty rewatch list
     rewatch_list.clear()
 
-    #create button_list
-    button_list = []
-    create_column_buttons(button_list)
-
-    # create textbox
-    textbox = button.click_button((0, 0), (700, 100), menu_color, "")
-    textbox.text = "Player 1's Move"
-    textbox.draw(game_surface)
-
-    # draw board
-    draw_board(board)
-
-    #update surface
-    update_game_surface()
-
+    #loop untill there is a winner/tie
     winner = -1  # 0 = tie, 1 = player 1, 2 = player 2
     while (winner == -1):
 
+        # change text box to indicate who's turn it is
+        player_string = "Player " + str((turn) % 2 + 1) + "'s Move"
+        game_textbox.text = player_string
+        game_textbox.draw()
+
+        # draw board and buttons to game_surface
+        draw_board_game_surface(board)
+        draw_buttons_game_surface()
+
+        # display game_surface
+        display_game_surface()
+
+        #loop until a valid column is selected
         selected_column = -1
         while (selected_column == -1):
 
             #get move from player
-            selected_column = request_move_player(button_list)
+            selected_column = request_move_player()
 
             #if it is invalid then repeat
             if(gamelogic.check_valid(board, selected_column) == False):
@@ -191,95 +210,247 @@ def localPvP():
         #add move to gameboard
         gamelogic.add_piece(board, selected_column, turn)
 
+        #add move to rewatch list
         rewatch_list.append(selected_column)
 
         # increment turn
         turn = turn + 1
 
-        # change text box
-        player_string = "Player " + str((turn)%2+1) + "'s Move"
-        textbox.text = player_string
-        textbox.draw(game_surface)
-
-        #redraw board
-        draw_board(board)
-
-        #update surface
-        update_game_surface()
-
+        #check for winner
         winner = gamelogic.check_win(board, turn)
 
     #display who won
     winner_string = "Player " + str(winner) + " Wins!"
     if(winner == 0):
         winner_string = "TIE!"
-    textbox.text = winner_string
-    textbox.draw(game_surface)
+    game_textbox.text = winner_string
 
-    #update surface
-    update_game_surface()
+    # draw board and buttons to game_surface
+    draw_board_game_surface(board)
+    draw_buttons_game_surface()
 
-    #keep open till input
-    request_move_player(button_list)
+    # display game_surface
+    display_game_surface()
+
+    #keep open till user decides to close
+    request_move_player()
 
 
-# TODO for later
+#TODO:
+#waits until response from server that indicates move, this will need to parse the raw byte data from the socket into a python int
+#args: os.socket socket
+#retun: int indicating column choice
+def request_move_online(socket):
+    return random.randrange(0,7,1)
+
+#TODO:
+#sends selected move to column, int needs to be parsed to byte[] before being sent over socket
+#args: os.socket socket, int column
+def send_move_online(socket, column):
+    pass
+
 def onlinePvP():
-    print('online pvp')
+
+    #TODO:
+    #display menu for configuring connection
+    #user will either enter or request a pairing code
+    #if requesting pairing code they will also indicate if they are going first or not
+
+    # player turn == 0 means player is going first
+    player_turn = 0
+
+    # socket for network communications
+    sock = "PLACEHOLDER STRING"
+
+    # initialize game logic vars
+    board = [[0] * 6 for i in range(7)]
+    turn = 0
+
+    # empty rewatch list
+    rewatch_list.clear()
+
+    # loop untill there is a winner/tie
+    winner = -1  # 0 = tie, 1 = player 1, 2 = player 2
+    while (winner == -1):
+
+        # change text box to indicate who's turn it is
+        player_string = "Player " + str((turn) % 2 + 1) + "'s Move"
+        game_textbox.text = player_string
+        game_textbox.draw()
+
+        # draw board and buttons to game_surface
+        draw_board_game_surface(board)
+        draw_buttons_game_surface()
+
+        # display game_surface
+        display_game_surface()
+
+        # loop until a valid column is selected
+        selected_column = -1
+        while (selected_column == -1):
+
+            if turn % 2 == player_turn:
+                # get move from player
+                selected_column = request_move_player()
+
+                # if it is invalid then repeat, otherwise send move to server
+                if (gamelogic.check_valid(board, selected_column) == False):
+                    selected_column = -1
+                else:
+                    send_move_online(sock, selected_column)
+
+            else:
+                selected_column = request_move_online(sock)
+
+        # add move to gameboard
+        gamelogic.add_piece(board, selected_column, turn)
+
+        # add move to rewatch list
+        rewatch_list.append(selected_column)
+
+        # increment turn
+        turn = turn + 1
+
+        # check for winner
+        winner = gamelogic.check_win(board, turn)
+
+    # display who won
+    winner_string = "Player " + str(winner) + " Wins!"
+    if (winner == 0):
+        winner_string = "TIE!"
+    game_textbox.text = winner_string
+
+    # draw board and buttons to game_surface
+    draw_board_game_surface(board)
+    draw_buttons_game_surface()
+
+    # display game_surface
+    display_game_surface()
+
+    # keep open till user decides to close
+    request_move_player()
 
 
-def localPvAI():
-    print('pvai')
+#args: [][] board, int difficulty
+#return: column of move chosen by AI
+def request_move_AI(board, difficulty):
+    if(difficulty == 0):
+        return random.randrange(0,7,1)
+
+    # TODO implement search algorithm
+    elif difficulty > 0:
+        return 1
+
+def PvAI():
+
+    #TODO:
+    #call fuction that displays menu asking for parameters
+    #parameters are AI difficulty and whether player is going first or second
+
+    #player turn == 0 means player is going first
+    player_turn = 0
+
+    #ai_difficulty == 0 means random, 0> are progressivly difficult
+    ai_difficulty = 0
+
+    # initialize game logic vars
+    board = [[0] * 6 for i in range(7)]
+    turn = 0
+
+    # empty rewatch list
+    rewatch_list.clear()
+
+    # loop untill there is a winner/tie
+    winner = -1  # 0 = tie, 1 = player 1, 2 = player 2
+    while (winner == -1):
+
+        # change text box to indicate who's turn it is
+        player_string = "Player " + str((turn) % 2 + 1) + "'s Move"
+        game_textbox.text = player_string
+        game_textbox.draw()
+
+        # draw board and buttons to game_surface
+        draw_board_game_surface(board)
+        draw_buttons_game_surface()
+
+        # display game_surface
+        display_game_surface()
+
+        # loop until a valid column is selected
+        selected_column = -1
+        while (selected_column == -1):
+
+            if turn%2 == player_turn:
+                # get move from player
+                selected_column = request_move_player()
+
+                # if it is invalid then repeat
+                if (gamelogic.check_valid(board, selected_column) == False):
+                    selected_column = -1
+
+            else:
+                #sleep to give player time to unclick mouse
+                pygame.time.wait(100)
+
+                selected_column = request_move_AI(board, ai_difficulty)
+
+        # add move to gameboard
+        gamelogic.add_piece(board, selected_column, turn)
+
+        # add move to rewatch list
+        rewatch_list.append(selected_column)
+
+        # increment turn
+        turn = turn + 1
+
+        # check for winner
+        winner = gamelogic.check_win(board, turn)
+
+    # display who won
+    winner_string = "Player " + str(winner) + " Wins!"
+    if (winner == 0):
+        winner_string = "TIE!"
+    game_textbox.text = winner_string
+
+    # draw board and buttons to game_surface
+    draw_board_game_surface(board)
+    draw_buttons_game_surface()
+
+    # display game_surface
+    display_game_surface()
+
+    # keep open till user decides to close
+    request_move_player()
 
 
-def localAIvAI():
+def AIvAI():
     print('aivai')
-
-def request_move_rewatch(turn):
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                return rewatch_list[turn]
-            if event.type == pygame.KEYDOWN:
-                return rewatch_list[turn]
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
 
 def rewatch():
     # initialize game logic vars
     board = [[0] * 6 for i in range(7)]
     turn = 0
 
-    print(rewatch_list)
+    # update textbox
+    game_textbox.text = "Click anywhere to progress replay"
+    game_textbox.draw()
 
-    # create button_list
-    button_list = []
-    create_column_buttons(button_list)
-
-    # create textbox
-    textbox = button.click_button((0, 0), (700, 100), menu_color, "")
-    textbox.text = "Cllick board to advance"
-    textbox.draw(game_surface)
-
-    # draw board
-    draw_board(board)
-
-    # update surface
-    update_game_surface()
-
+    # loop untill there is a winner/tie
     winner = -1  # 0 = tie, 1 = player 1, 2 = player 2
     while (winner == -1):
 
-        selected_column = -1
-        while (selected_column == -1):
+        # draw board and buttons to game_surface
+        draw_board_game_surface(board)
+        draw_buttons_game_surface()
 
-            # get move from player
-            selected_column = request_move_rewatch(turn)
+        # display game_surface
+        display_game_surface()
 
-            # if it is invalid then repeat
-            if (gamelogic.check_valid(board, selected_column) == False):
-                selected_column = -1
+        #block until player input
+        request_move_player()
+
+        # get saved move
+        selected_column = rewatch_list[turn]
 
         # add move to gameboard
         gamelogic.add_piece(board, selected_column, turn)
@@ -287,26 +458,24 @@ def rewatch():
         # increment turn
         turn = turn + 1
 
-        # redraw board
-        draw_board(board)
-
-        # update surface
-        update_game_surface()
-
+        #check for winner
         winner = gamelogic.check_win(board, turn)
 
     # display who won
     winner_string = "Player " + str(winner) + " Wins!"
     if (winner == 0):
         winner_string = "TIE!"
-    textbox.text = winner_string
-    textbox.draw(game_surface)
+    game_textbox.text = winner_string
 
-    # update surface
-    update_game_surface()
+    # draw board and buttons to game_surface
+    draw_board_game_surface(board)
+    draw_buttons_game_surface()
+
+    # display game_surface
+    display_game_surface()
 
     # keep open till input
-    request_move_rewatch(0)
+    request_move_player()
 
 
 if __name__ == '__main__':
