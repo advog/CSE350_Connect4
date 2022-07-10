@@ -1,7 +1,8 @@
 import pygame
 import random
 import os
-
+import json
+import socket
 import button
 import gamelogic
 
@@ -24,6 +25,11 @@ button_color = (51,255,255)
 # initialize display_surface
 display_surface = pygame.display.set_mode((Xmax, Ymax))
 pygame.display.set_caption('Ultimate Connect 4')
+
+#initialize socket
+host = socket.gethostname()
+port = 42068
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 #load assets
 logo = pygame.image.load('logo.png')
@@ -240,14 +246,23 @@ def localPvP():
 #waits until response from server that indicates move, this will need to parse the raw byte data from the socket into a python int
 #args: os.socket socket
 #retun: int indicating column choice
-def request_move_online(socket):
-    return random.randrange(0,7,1)
+def request_move_online():
+    #try:
+    col = client.recv(1024)
+    return int.from_bytes(col)
+    #except:
+    #    print('didnt work')
+    #    return random.randrange(0,7,1)
 
 #TODO:
 #sends selected move to column, int needs to be parsed to byte[] before being sent over socket
 #args: os.socket socket, int column
-def send_move_online(socket, column):
-    pass
+def send_move_online(column):
+    #try:
+    client.sendall(int.to_bytes(column))
+    #except:
+    #    print('didnt work')
+    #    pass
 
 def onlinePvP():
 
@@ -259,8 +274,9 @@ def onlinePvP():
     # player turn == 0 means player is going first
     player_turn = 0
 
-    # socket for network communications
-    sock = "PLACEHOLDER STRING"
+    # connect to socket for network communications
+    client.connect((host, port))
+    client.setblocking(0)
 
     # initialize game logic vars
     board = [[0] * 6 for i in range(7)]
@@ -297,10 +313,10 @@ def onlinePvP():
                 if (gamelogic.check_valid(board, selected_column) == False):
                     selected_column = -1
                 else:
-                    send_move_online(sock, selected_column)
+                    send_move_online(selected_column)
 
             else:
-                selected_column = request_move_online(sock)
+                selected_column = request_move_online()
 
         # add move to gameboard
         gamelogic.add_piece(board, selected_column, turn)
