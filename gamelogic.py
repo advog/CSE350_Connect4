@@ -1,123 +1,44 @@
+#checks if move is valid
+#args: [][] board, int column
+#return: 1 if True if valid, False if invalid
 def check_valid(board, column):
-    if(column == -1):
-        value = False
-    elif(board[column][get_open_row(board, column)][1] == 0):
-        value = True
-    else:
-        value = False
-    return value
-
-def get_open_row(board, col):
-    row = -1
     for i in range(6):
-        if(board[col][i][1]==0):
-            row = i
-    return row
+        if(board[column][i] == 0):
+            return True
+    return False
 
-def upadate_board(board, column, turn):
-    if(turn%2 == 1):
-        player_value = 1
-    else:
-        player_value = 2
-    for row in range(0,6):
-        if(board[column][row][1] != 0):
-            board[column][row-1] = player_value
-            return
-        elif(row == 5):
-            board[column][row-1] = player_value
+#adds piece to board
+#args: [][] board, int column, int turn
+def add_piece(board, column, turn):
+    for i in range(5,-1, -1):
+        if(board[column][i] == 0):
+            board[column][i] = turn%2+1
             return
 
-def check_win(board, turn, start_column):
-    if(turn%2 == 1):
-        player_value = 1
-    else:
-        player_value = 2
-    next_turn = 0
-    win = 1
-    tie = 2
-    start_row = 0
-    count = 0
+#args: [][] board, int turn
+#return: -1 = no winner, 0 = tie, 1/2 = player 1/2 won
+def check_win(board, turn):
+    for x in range(7):
+        for y in range(6):
+            #vertical
+            if(y > 2):
+                if(board[x][y] == board[x][y-1] == board[x][y-2] == board[x][y-3] != 0):
+                    return board[x][y]
+            #up diagnal
+            if (y > 2 and x < 4):
+                if (board[x][y] == board[x+1][y - 1] == board[x+2][y - 2] == board[x+3][y - 3] != 0):
+                    return board[x][y]
+            #horizontal
+            if (x < 4):
+                if (board[x][y] == board[x+1][y] == board[x+2][y] == board[x+3][y] != 0):
+                    return board[x][y]
+            #down diagnal
+            if (x < 4 and y < 3):
+                if (board[x][y] == board[x+1][y+1] == board[x+2][y+2] == board[x+3][y+3] != 0):
+                    return board[x][y]
 
-    # Checking Down Win
-    for row in range(0,6):
-        if(board[start_column][row][1] == player_value):
-            if(count == 0):
-                start_row = row
-            count += 1
-            if(count == 4):
-                return win
-        elif(board[start_column][row][1] == 0):
-            continue
-        elif(board[start_column][row][1] != player_value):
-            break
+    #if the board is full with no winnners then return tie
+    if (turn == 42):
+        return 0
 
-    # Checking Across Win
-    count = 0
-    for column in range(start_column,-1, -1):
-        if(board[column][start_row] == player_value):
-            count += 1
-            if(count == 4):
-                return win
-        else:
-            break
-    for column in range(start_column+1, 7):
-        if(board[column][start_row] == player_value):
-            count += 1
-            if(count == 4):
-                return win
-        else:
-            break
-
-    #Checking Positive Diagonal Win
-    count = 0
-    row = start_row
-    column = start_column
-    while(row < 6 and column > -1):
-        if(board[column][row][1] == player_value):
-            count += 1
-            if(count == 4):
-                return win
-        else:
-            break
-        row += 1
-        column -= 1
-    row = start_row - 1
-    column = start_column + 1
-    while(row > -1  and column < 7):
-        if(board[column][row][1] == player_value):
-            count += 1
-            if(count == 4):
-                return win
-        else:
-            break
-        row -= 1
-        column += 1
-
-    #Checking Negative Diagonal Win
-    count = 0
-    row = start_row
-    column = start_column
-    while(column > -1 and row > -1):
-        if(board[column][row][1] == player_value):
-            count += 1
-            if(count == 4):
-                return win
-        else:
-            break
-        row -= 1
-        column -= 1
-    row = start_row + 1
-    column = start_column + 1
-    while(row < 6  and column < 7):
-        if(board[column][row][1] == player_value):
-            count += 1
-            if(count == 4):
-                return win
-        else:
-            break
-        row += 1
-        column += 1
-    if(turn == 42):
-        return tie
-    else:
-        return next_turn
+    return -1
