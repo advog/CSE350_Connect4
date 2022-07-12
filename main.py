@@ -1,7 +1,8 @@
 import pygame
 import random
 import os
-
+import socket
+import json
 import gui
 import gamelogic
 
@@ -19,6 +20,10 @@ empty_color = (1, 0, 60)
 player1_color = (255, 0, 0)
 player2_color = (255, 255, 0)
 menu_color = (2,178,255)
+
+# intiialize network addresses
+host = socket.gethostname()
+port = 42071
 
 # initialize display_surface
 display_surface = pygame.display.set_mode((Xmax, Ymax))
@@ -118,20 +123,26 @@ def localPvP():
 #retun: int indicating column choice
 def request_move_online(socket):
     return random.randrange(0,7,1)
+    pack = socket.recv(20)
+    column = json.loads(pack.decode())
+    return int(column)
+
 
 #TODO:
 #sends selected move to column, s
 #args: os.socket socket, int column
 def send_move_online(socket, column):
-    pass
+    pack = json.dumps(str(column))
+    socket.setblocking(1)
+    socket.sendall(bytes(pack, encoding='utf-8'))
+    socket.setblocking(0)
 
 #TODO:
 #displays gui that allows user to configure network settings
 #args: TBD
 #return: int
 def online_config():
-    return 1, 11233213
-
+    return input()
 #TODO:
 #connects to server and initiates game
 def connect_server():
@@ -140,7 +151,9 @@ def connect_server():
 def onlinePvP():
 
     #intiialize socket connection to server
-
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((host, port))
+    sock.setblocking(0)
 
     # player -1 if player is hosting, n if player is connecting
     connection_code = online_config()
@@ -150,6 +163,7 @@ def onlinePvP():
         #recieve code from server
         #display code to GUI
         #redraw GUI
+        player_turn = 0
     else:
         player_turn = 1
         #send connection code to server

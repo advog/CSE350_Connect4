@@ -2,17 +2,17 @@ import socket
 import gamelogic
 
 host = socket.gethostname()
-port = 42068
+port = 42071
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.bind((host, port))
-sock.listen(5)
+serve = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+serve.bind((host, port))
+serve.listen(5)
 
 class Game:
     def __init__(self):
         try:
-            self.conn1, self.addr1 = sock.accept()
-            self.conn2, self.addr2 = sock.accept()
+            self.conn1, self.addr1 = serve.accept()
+            self.conn2, self.addr2 = serve.accept()
             print("Successful Connections")
         except:
             print("Failed Connections")
@@ -43,5 +43,5 @@ game = Game()
 while game.progress():
     print('Cycled')
 
-play1.close()
-play2.close()
+game.conn1.close()
+game.conn2.close()
