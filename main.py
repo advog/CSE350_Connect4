@@ -147,6 +147,7 @@ def onlinePvP():
     player_turn = 0
     if(connection_code == -1):
         #request code from server
+        #recieve code from server
         #display code to GUI
         #redraw GUI
     else:
@@ -155,7 +156,7 @@ def onlinePvP():
         #display status to GUI
         #redraw GUI
 
-
+    #wait until game is started by server
 
     # initialize game logic vars
     board = [[0] * 6 for i in range(7)]
