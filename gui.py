@@ -164,13 +164,16 @@ class ai_config_gui:
     def __init__(self, display_surface, width, height):
         pass
 
+
     def draw_xxxx(self):
+        pass
+
+    #copies internal surface to external_surface
+    def update_display(self):
         pass
 
     #returns player_turn and ai_difficulty
     def get_config(self):
-
-
 
         pass
 
@@ -182,3 +185,19 @@ class ai_config_gui:
 #TODO:
 #create network config gui
 #should have method that returns int matching code
+class ai_config_gui:
+    def __init__(self, display_surface, width, height):
+        pass
+
+    #draws components of GUI to the internal surface
+    def draw_xxxx(self):
+        pass
+
+    #copies the internal surface to the external_surface
+    def update_display(self):
+        pass
+
+    #returns player_turn and ai_difficulty
+    def get_config(self):
+
+        pass
