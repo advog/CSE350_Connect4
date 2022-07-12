@@ -142,8 +142,20 @@ def onlinePvP():
     #intiialize socket connection to server
 
 
-    # player turn == 0 means player is going first
-    player_turn, sock = online_config()
+    # player -1 if player is hosting, n if player is connecting
+    connection_code = online_config()
+    player_turn = 0
+    if(connection_code == -1):
+        #request code from server
+        #display code to GUI
+        #redraw GUI
+    else:
+        player_turn = 1
+        #send connection code to server
+        #display status to GUI
+        #redraw GUI
+
+
 
     # initialize game logic vars
     board = [[0] * 6 for i in range(7)]
