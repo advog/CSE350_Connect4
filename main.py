@@ -15,6 +15,8 @@ Ymax = 700
 # color globals
 menu_color = (2,178,255)
 button_color = (51,255,255)
+white_color = (255, 255, 255)
+pressed_button_color = (0, 90, 110)
 empty_color = (1, 0, 60)
 player1_color = (255, 0, 0)
 player2_color = (255, 255, 0)
@@ -27,6 +29,7 @@ pygame.display.set_caption('Ultimate Connect 4')
 #initialize guis
 menu_gui = gui.menu_gui(display_surface, Xmax, Ymax)
 game_gui = gui.game_gui(display_surface, Xmax, Ymax)
+ai_config_gui = gui.ai_config_gui(display_surface, Xmax, Ymax)
 
 #most recent game list
 rewatch_list = []
@@ -38,12 +41,15 @@ rewatch_list = []
 # main loop, calls start menu to get an int indicating gamemode from the player then begins the chosen gamemode
 def main():
     #draw start menu
-
-    menu_gui.draw_buttons()
-    menu_gui.update_display()
+    ai_config_gui.draw_buttons()
+    ai_config_gui.update_display()
+    #UNCOMMENT BEFORE MERGING!!!!!!!!!!
+    #menu_gui.draw_buttons()
+    #menu_gui.update_display()
 
     while (True):
-        menu_gui.update_display()
+        ai_config_gui.update_display()
+        # menu_gui.update_display()
         choice = menu_gui.request_menu_choice()
         if (choice == 0):   localPvP()
         elif (choice == 1):   onlinePvP()

@@ -4,6 +4,8 @@ import pygame
 #define colors
 menu_color = (2,178,255)
 button_color = (51,255,255)
+white_color = (255, 255, 255)
+pressed_button_color = (0, 90, 110)
 empty_color = (1, 0, 60)
 player1_color = (255, 0, 0)
 player2_color = (255, 255, 0)
@@ -162,17 +164,56 @@ class menu_gui:
 #should have method that returns int player_turn, int ai_difficulty
 class ai_config_gui:
     def __init__(self, display_surface, width, height):
-        pass
+        self.width = width
+        self.height = height
+        self.display_surface = display_surface
 
-    def draw_xxxx(self):
-        pass
+        #init the display
+        self.ai_config_surface = pygame.Surface((self.width, self.height))
+        self.ai_config_surface.fill(menu_color)
+
+        # add buttons to ai_level_buttons
+        self.ai_level_buttons = []
+        random_button = button.click_button((self.width / 12, self.height*(3/8)), (240, 50), button_color, "Random", self.ai_config_surface)
+        self.ai_level_buttons.append(random_button)
+        easy_button = button.click_button((self.width / 12, self.height*(3/8)+ 60), (240, 50), button_color, "Easy", self.ai_config_surface)
+        self.ai_level_buttons.append(easy_button)
+        hard_button = button.click_button((self.width / 12, self.height*(3/8)+ 120), (240, 50), button_color, "Hard", self.ai_config_surface)
+        self.ai_level_buttons.append(hard_button)
+        impossible_button = button.click_button((self.width / 12, self.height*(3/8)+ 180), (240, 50), pressed_button_color, "Impossible", self.ai_config_surface)
+        self.ai_level_buttons.append(impossible_button)
+
+        self.turn_buttons = []
+        player_first_button = button.click_button((self.width / 12, self.height*(1/8)), (240, 50), button_color, "Player Goes First", self.ai_config_surface)
+        self.turn_buttons.append(player_first_button)
+        ai_first_button = button.click_button((self.width / 12 + 270, self.height*(1/8)), (240, 50), pressed_button_color, "AI Goes First", self.ai_config_surface)
+        self.turn_buttons.append(ai_first_button)
+
+        self.all_buttons = []
+        confirm_button = button.click_button((self.width / 12 + 270, self.height*(3/8)), (240, 230), white_color, "Confirm", self.ai_config_surface)
+        self.all_buttons.append(confirm_button)
+        self.all_buttons.extend(self.ai_level_buttons)
+        self.all_buttons.extend(self.turn_buttons)
+
+    def draw_buttons(self):
+        for b in self.all_buttons:
+            b.draw()
+
+    def update_display(self):
+        self.display_surface.blit(self.ai_config_surface, (0, 0))
+        pygame.display.flip()
 
     #returns player_turn and ai_difficulty
     def get_config(self):
-
-
-
         pass
+        # while True:
+        #     for event in pygame.event.get():
+        #         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    
+
+        #         if event.type == pygame.QUIT:
+        #             pygame.quit()
+        #             quit()
 
 
 ####################
