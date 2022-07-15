@@ -126,7 +126,16 @@ def send_move_online(socket, column):
     pass
 
 def onlinePvP():
+
     #TODO:
+
+    network_gui = gui.network_config_gui(display_surface, Xmax, Ymax)
+    network_gui.draw_buttons()
+    network_gui.update_display()
+    configs = network_gui.get_config()
+    print(configs)
+
+
     #intiialize socket connection to server
 
     # player -1 if player is hosting, n if player is connecting
@@ -137,6 +146,7 @@ def onlinePvP():
 
     player_turn = 0
     if(connection_code == -1):
+        player_turn=0
         #request code from server
         #recieve code from server
         #display code to GUI

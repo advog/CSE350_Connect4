@@ -54,8 +54,8 @@ class game_gui:
                     color = player1_color
                 elif (board[x][y] == 2):
                     color = player2_color
-                circ_offset = ((x+.5) * self.block_width, (y + 1.5) * self.block_height)
-                pygame.draw.circle(self.game_surface, color, circ_offset, circle_size)
+                circ_offset = (int((x+.5) * self.block_width), int((y + 1.5) * self.block_height))
+                pygame.draw.circle(self.game_surface, color, circ_offset, int(circle_size))
 
     def draw_text(self, text):
         self.game_textbox.text = text
@@ -165,6 +165,10 @@ class ai_config_gui:
         pass
 
 
+        #button creation
+
+
+
     def draw_xxxx(self):
         pass
 
@@ -196,19 +200,98 @@ class ai_config_gui:
 #TODO:
 #create network config gui
 #should have method that returns int matching code
-class ai_config_gui:
+class network_config_gui:
     def __init__(self, display_surface, width, height):
-        pass
+        self.width = width
+        self.height = height
+        self.display_surface = display_surface
+        self.hosting = False
+        self.connecting = False
+        self.hostCode = ""
+        self.connectCode = ""
+        self.codeEntered = False
+        self.returnIndex = 0
+
+        # init the display
+        self.menu_surface = pygame.Surface((self.width, self.height))
+        self.menu_surface.fill(menu_color)
+        self.menu_surface.blit(logo, (0, 0))
+
+        self.menu_buttons = []
+        connect_textbox_button = button.click_button((self.width / 2 - 250, self.height * (5 / 7)), (200, 50), button_color, "", self.menu_surface)
+        self.menu_buttons.append(connect_textbox_button)
+        connect_game_button = button.click_button((self.width / 2 -40, self.height * (5 / 7)), (290, 50), button_color,"Connect to Game", self.menu_surface)
+        self.menu_buttons.append(connect_game_button)
+        host_textbox_button = button.click_button((self.width / 2 - 250, self.height * (5 / 7) + 60), (200, 50), button_color,"", self.menu_surface)
+        self.menu_buttons.append(host_textbox_button)
+        host_button = button.click_button((self.width / 2 -40, self.height * (5 / 7) + 60), (290, 50), button_color,"Generate Host Code", self.menu_surface)
+        self.menu_buttons.append(host_button)
+        feedback_button = button.click_button((self.width / 2 - 250, self.height * (5 / 7) + 120), (500, 50),button_color, "Feedback", self.menu_surface)
+        self.menu_buttons.append(feedback_button)
+
+        # map for readability
+        self.menu_button_map = ["connect_text", "connect", "host_text", "host", "feedback"]
 
     #draws components of GUI to the internal surface
-    def draw_xxxx(self):
-        pass
+    def draw_buttons(self):
+        for b in self.menu_buttons:
+            b.draw()
 
     #copies the internal surface to the external_surface
     def update_display(self):
-        pass
+        self.display_surface.blit(self.menu_surface, (0, 0))
+        pygame.display.flip()
+
+    def generateHostCode(self):
+        return "ABCD"
+
+    def check_clicked(self, pos):
+        for i in range(len(self.menu_buttons)):
+            if self.menu_buttons[i].check_clicked(pos):
+                return i
+        return -1
 
     #returns player_turn and ai_difficulty
     def get_config(self):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    pos = pygame.mouse.get_pos()
+                    clicked_index = self.check_clicked(pos)
+                    if clicked_index != -1:
+                        if clicked_index <2:
+                            self.connecting=True
+                        else:
+                            self.hosting = True
+                            self.returnIndex = 1
+                            self.hostCode = self.generateHostCode()
+                            self.menu_buttons[2].text = self.hostCode
+                            self.menu_buttons[4].text = "You are Hosting!"
 
-        pass
+                        if (clicked_index==1 and len(self.menu_buttons[0].text)==4):
+                            self.codeEntered=True
+                            self.returnIndex=2
+                            self.connectCode=self.menu_buttons[0].text
+                            self.menu_buttons[4].text = "Waiting to Connect..."
+
+                if self.connecting == True:
+                    if event.type == pygame.KEYDOWN:
+                        key = event.unicode
+                        currCode = self.menu_buttons[0].text
+                        if event.key == pygame.K_BACKSPACE:
+                            self.menu_buttons[0].text = currCode[:-1]
+                        elif len(currCode)>3:
+                            break
+                        elif key.isalpha()==False:
+                            break
+                        else:
+                            self.menu_buttons[0].text = (currCode+key).upper()
+
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+            if (self.hosting == True or self.codeEntered == True):
+                break
+            self.draw_buttons()
+            self.update_display()
+        return (self.returnIndex,self.hostCode,self.connectCode)
