@@ -10,7 +10,7 @@ player2_color = (255, 255, 0)
 menu_color = (2,178,255)
 
 #load assets
-logo = pygame.image.load('logo.png')
+logo = pygame.image.load('logo2.png')
 
 ###############
 #gameboard gui#
