@@ -125,36 +125,29 @@ def request_move_online(socket):
 def send_move_online(socket, column):
     pass
 
-#TODO:
-#displays gui that allows user to configure network settings
-#args: TBD
-#return: int
-def online_config():
-    return 1, 11233213
-
-#TODO:
-#connects to server and initiates game
-def connect_server():
-    pass
-
 def onlinePvP():
-
+    #TODO:
     #intiialize socket connection to server
 
-
     # player -1 if player is hosting, n if player is connecting
-    connection_code = online_config()
+
+    #reset the network_config_menu then request info from it
+    #connection_code = network_config_menu.online_config()
+    connection_code = -1;
+
     player_turn = 0
     if(connection_code == -1):
         #request code from server
         #recieve code from server
         #display code to GUI
         #redraw GUI
+        pass
     else:
         player_turn = 1
         #send connection code to server
         #display status to GUI
         #redraw GUI
+        pass
 
     #wait until game is started by server
 

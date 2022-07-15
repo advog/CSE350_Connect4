@@ -174,8 +174,19 @@ class ai_config_gui:
 
     #returns player_turn and ai_difficulty
     def get_config(self):
-
-        pass
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    pos = pygame.mouse.get_pos()
+                    #if box1.clicked(pos) == true:
+                        #self.difficulty = 1
+                    #elif box2.clicked(pos) == true:
+                        #self.difficulty = 2
+                    #if boxConfirm.clicked(pos) == true
+                        #difficulty, player_turn
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
 
 
 ####################
