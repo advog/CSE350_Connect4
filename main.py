@@ -50,6 +50,7 @@ def main():
     while (True):
         ai_config_gui.update_display()
         # menu_gui.update_display()
+        print(ai_config_gui.get_config())
         choice = menu_gui.request_menu_choice()
         if (choice == 0):   localPvP()
         elif (choice == 1):   onlinePvP()
