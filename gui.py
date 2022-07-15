@@ -159,9 +159,6 @@ class menu_gui:
 #AI config gui#
 ###############
 
-#TODO:
-#create ai config gui
-#should have method that returns int player_turn, int ai_difficulty
 class ai_config_gui:
     def __init__(self, display_surface, width, height):
         self.width = width
@@ -234,9 +231,6 @@ class ai_config_gui:
 #network config GUI#
 ####################
 
-#TODO:
-#create network config gui
-#should have method that returns int matching code
 class network_config_gui:
     def __init__(self, display_surface, width, height):
         self.width = width
