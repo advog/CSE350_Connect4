@@ -27,6 +27,10 @@ class click_button:
 
     def check_clicked(self, pos):
         return self.rect.collidepoint(pos)
+    
+    #args:(r,g,b) color
+    def change_color(self, color):
+        self.color = color
 
 
 #easier for click detection, only method is to check if click pos is within button
