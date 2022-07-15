@@ -2,7 +2,7 @@ import socket
 import gamelogic
 
 host = socket.gethostname()
-port = 42071
+port = 42072
 
 serve = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 serve.bind((host, port))
@@ -27,13 +27,13 @@ class Game:
             self.conn2.sendall(data)
             if not data:
                 return False
-            print(str(addr1), data)
+            print(str(self.addr1), data)
         else:
             data = self.conn2.recv(1024)
             self.conn1.sendall(data)
             if not data:
                 return False
-            print(str(addr2), data)
+            print(str(self.addr2), data)
         turn+=1
 
 turn = 0

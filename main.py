@@ -23,7 +23,7 @@ menu_color = (2,178,255)
 
 # intiialize network addresses
 host = socket.gethostname()
-port = 42071
+port = 42072
 
 # initialize display_surface
 display_surface = pygame.display.set_mode((Xmax, Ymax))
@@ -123,19 +123,18 @@ def localPvP():
 #retun: int indicating column choice
 def request_move_online(socket):
     return random.randrange(0,7,1)
-    pack = socket.recv(20)
-    column = json.loads(pack.decode())
-    return int(column)
+    pack = socket.recv(1024)
+    data = json.loads(pack.decode(encoding='utf-8'))
+    print(pack)
+    return int(data["column"])
 
 
 #TODO:
 #sends selected move to column, s
 #args: os.socket socket, int column
 def send_move_online(socket, column):
-    pack = json.dumps(str(column))
-    socket.setblocking(1)
+    pack = json.dumps({"column": column}, sort_keys=True)
     socket.sendall(bytes(pack, encoding='utf-8'))
-    socket.setblocking(0)
 
 #TODO:
 #displays gui that allows user to configure network settings
