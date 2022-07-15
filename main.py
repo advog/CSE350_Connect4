@@ -41,16 +41,11 @@ rewatch_list = []
 # main loop, calls start menu to get an int indicating gamemode from the player then begins the chosen gamemode
 def main():
     #draw start menu
-    ai_config_gui.draw_buttons()
-    ai_config_gui.update_display()
-    #UNCOMMENT BEFORE MERGING!!!!!!!!!!
-    #menu_gui.draw_buttons()
-    #menu_gui.update_display()
+    menu_gui.draw_buttons()
+    menu_gui.update_display()
 
     while (True):
-        ai_config_gui.update_display()
-        # menu_gui.update_display()
-        print(ai_config_gui.get_config())
+        menu_gui.update_display()
         choice = menu_gui.request_menu_choice()
         if (choice == 0):   localPvP()
         elif (choice == 1):   onlinePvP()
@@ -241,8 +236,11 @@ def request_move_AI(turn, board, difficulty):
 
 def PvAI():
 
+    ai_config_gui.draw_buttons()
+    ai_config_gui.update_display()
+
     #player turn == 0 means player is going first
-    player_turn, ai_difficulty = ai_config_menu.get_config()
+    player_turn, ai_difficulty = ai_config_gui.get_config()
 
     # initialize game logic vars
     board = [[0] * 6 for i in range(7)]

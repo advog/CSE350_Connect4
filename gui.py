@@ -205,10 +205,6 @@ class ai_config_gui:
         self.display_surface.blit(self.ai_config_surface, (0, 0))
         pygame.display.flip()
 
-    #copies internal surface to external_surface
-    def update_display(self):
-        pass
-
     #returns player_turn and ai_difficulty
     def get_config(self):
         while True:
@@ -216,7 +212,7 @@ class ai_config_gui:
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     pos = pygame.mouse.get_pos()
                     if self.confirm_button.check_clicked(pos) == True:
-                        return (self.ai_level, self.turn)
+                        return (self.turn, self.ai_level)
                     for turns in range(len(self.turn_buttons)):
                         if self.turn_buttons[turns].check_clicked(pos) == True:
                             self.turn_buttons[self.turn].change_color(button_color)
