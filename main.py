@@ -1,7 +1,7 @@
 import pygame
 import random
 import os
-
+import ai
 import gui
 import gamelogic
 
@@ -15,8 +15,6 @@ Ymax = 700
 # color globals
 menu_color = (2,178,255)
 button_color = (51,255,255)
-white_color = (255, 255, 255)
-pressed_button_color = (0, 90, 110)
 empty_color = (1, 0, 60)
 player1_color = (255, 0, 0)
 player2_color = (255, 255, 0)
@@ -29,7 +27,6 @@ pygame.display.set_caption('Ultimate Connect 4')
 #initialize guis
 menu_gui = gui.menu_gui(display_surface, Xmax, Ymax)
 game_gui = gui.game_gui(display_surface, Xmax, Ymax)
-ai_config_gui = gui.ai_config_gui(display_surface, Xmax, Ymax)
 
 #most recent game list
 rewatch_list = []
@@ -41,6 +38,7 @@ rewatch_list = []
 # main loop, calls start menu to get an int indicating gamemode from the player then begins the chosen gamemode
 def main():
     #draw start menu
+
     menu_gui.draw_buttons()
     menu_gui.update_display()
 
@@ -127,28 +125,27 @@ def request_move_online(socket):
 def send_move_online(socket, column):
     pass
 
+#TODO:
+#displays gui that allows user to configure network settings
+#args: TBD
+#return: int
+def online_config():
+    return 1, 11233213
+
+#TODO:
+#connects to server and initiates game
+def connect_server():
+    pass
+
 def onlinePvP():
-
-    #TODO:
-
-    network_gui = gui.network_config_gui(display_surface, Xmax, Ymax)
-    network_gui.draw_buttons()
-    network_gui.update_display()
-    configs = network_gui.get_config()
-    print(configs)
-
 
     #intiialize socket connection to server
 
+
     # player -1 if player is hosting, n if player is connecting
-
-    #reset the network_config_menu then request info from it
-    #connection_code = network_config_menu.online_config()
-    connection_code = -1;
-
+    connection_code = online_config()
     player_turn = 0
     if(connection_code == -1):
-        player_turn=0
         #request code from server
         #recieve code from server
         #display code to GUI
@@ -159,7 +156,6 @@ def onlinePvP():
         #send connection code to server
         #display status to GUI
         #redraw GUI
-        pass
 
     #wait until game is started by server
 
@@ -236,11 +232,8 @@ def request_move_AI(turn, board, difficulty):
 
 def PvAI():
 
-    ai_config_gui.draw_buttons()
-    ai_config_gui.update_display()
-
     #player turn == 0 means player is going first
-    player_turn, ai_difficulty = ai_config_gui.get_config()
+    player_turn, ai_difficulty = ai_config_menu.get_config()
 
     # initialize game logic vars
     board = [[0] * 6 for i in range(7)]
