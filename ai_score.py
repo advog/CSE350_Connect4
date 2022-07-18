@@ -1,10 +1,12 @@
+import random
+
 COLUMN_COUNT = 7
 ROW_COUNT = 6
 
 WINDOW_LENGTH = 4
 
-PLAYER_PIECE = 0
-AI_PIECE = 1
+PLAYER_PIECE = 1
+AI_PIECE = 2
 
 EMPTY = 0
 
@@ -29,8 +31,9 @@ def evaluate_window(window, piece):
 #-------------------------------------------------------
 
 
-def score_position(board, piece):
-    score = 0
+def score_position():
+    score = random.randrange(0,7,1)
+    '''
 #score center columns
     center_array = [int(i) for i in list(board[:, COLUMN_COUNT/2])]
     center_count = center_array.count(piece)
@@ -54,6 +57,6 @@ def score_position(board, piece):
         for c in range(COLUMN_COUNT-3):
             window = [board[r+3][c+i] for i in range(WINDOW_LENGTH)]
             score += evaluate_window(window, piece)
-
+'''
     return score
 

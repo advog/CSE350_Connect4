@@ -221,7 +221,7 @@ def onlinePvP():
 
 #args: [][] board, int difficulty
 #return: column of move chosen by AI
-def request_move_AI(turn, board, difficulty):
+'''
     if(difficulty == 0):
         return random.randrange(0,7,1)
 
@@ -229,67 +229,74 @@ def request_move_AI(turn, board, difficulty):
     # implement search algorithm
     elif difficulty > 0:
         return 1
-
+        '''
+# -----------------------------------------------------------
 def PvAI():
 
     #player turn == 0 means player is going first
-    player_turn, ai_difficulty = ai_config_menu.get_config()
+    #player_turn, ai_difficulty = ai_config_menu.get_config()
 
     # initialize game logic vars
     board = [[0] * 6 for i in range(7)]
     turn = 0
 
-    # empty rewatch list
+    #empty rewatch list
     rewatch_list.clear()
 
-    # loop untill there is a winner/tie
+    #loop untill there is a winner/tie
     winner = -1  # 0 = tie, 1 = player 1, 2 = player 2
     while (winner == -1):
 
-        # update gui
-        player_string = "Player " + str((turn) % 2 + 1) + "'s Move"
-        game_gui.draw_text(player_string)
+        # update textbox
+        is_human = turn % 2 #whose turn is it 1 = player/human, 1 = AI
+        player_string = "Player's Move"
+        ai_string = "AI's Move"
+        if(is_human == 0):
+            game_gui.draw_text(player_string)
+        elif(is_human == 1):
+            game_gui.draw_text(ai_string)
         game_gui.draw_board(board)
         game_gui.update_display()
 
-        # loop until a valid column is selected
+        #loop until a valid column is selected
         selected_column = -1
-        while (selected_column == -1):
 
-            if turn%2 == player_turn:
-                # get move from player
+        if (is_human == 0):  #if its a humna/player
+            while (selected_column == -1):
+
+                #seed control to game_gui until player provides move
                 selected_column = game_gui.request_move_player()
 
-                # if it is invalid then repeat
-                if (gamelogic.check_valid(board, selected_column) == False):
+                #if it is invalid then repeat
+                if(gamelogic.check_valid(board, selected_column) == False):
+                    selected_column = -1
+        elif (is_human == 1):
+            while (selected_column == -1):
+                selected_column = ai.request_move_AI(board, 0, is_human)  # adjust difficulty
+                print(selected_column)
+                if(gamelogic.check_valid(board, selected_column) == False):
                     selected_column = -1
 
-            else:
-                #sleep to give player time to unclick mouse
-                pygame.time.wait(100)
-
-                selected_column = request_move_AI(turn, board, ai_difficulty)
-
-        # add move to gameboard
+        #add move to gameboard
         gamelogic.add_piece(board, selected_column, turn)
 
-        # add move to rewatch list
+        #add move to rewatch list
         rewatch_list.append(selected_column)
 
         # increment turn
         turn = turn + 1
 
-        # check for winner
+        #check for winner
         winner = gamelogic.check_win(board, turn)
 
-    # display who won
+    #display who won
     winner_string = "Player " + str(winner) + " Wins!"
-    if (winner == 0): winner_string = "TIE!"
+    if(winner == 0): winner_string = "TIE!"
     game_gui.draw_text(winner_string)
     game_gui.draw_board(board)
     game_gui.update_display()
 
-    # keep open till user decides to close
+    #keep open till user decides to close
     game_gui.request_move_player()
 
 
