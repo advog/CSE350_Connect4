@@ -21,18 +21,19 @@ struct client{
 };
 
 struct match{
-  client host;
-  client peer;
+  client *host;
+  client *peer;
 };
 
 //grabs the socket from the ID
-int get_match_from_ID(int dummy, match* running, int num_matches)
+int get_match_from_ID(int dummy, match *running, int num_matches)
 {
   for(int i = 0; i < num_matches; i++){
-    if(running[i].host.ID == dummy){
+    if(running[i].host->ID == dummy){
       return i;
     }
   }
+  return -1;
 };
 
 //main server loop
@@ -46,9 +47,9 @@ int main()
   int opt = 1;
   int decider;
 
-  //define arrays using structs (needs fixing for pointers)
+  //define arrays using structs
   client all_clients[MAX_CLIENTS];
-  match *matches[MAX_CLIENTS/2];
+  match matches[MAX_CLIENTS/2];
   struct sockaddr_in address;
   int addrlen = sizeof(address);
 
@@ -94,7 +95,7 @@ int main()
         //assigns a new ID using the indexer if the new client is the host
         if(all_clients[clientIndexer].buffer == oogle){
           all_clients[clientIndexer].ID = ID_indexer;
-          matches[0]->host = all_clients[clientIndexer];
+          matches[0].host = &all_clients[clientIndexer];
           ID_indexer++;
         }
 
@@ -104,7 +105,7 @@ int main()
           for(int i = 0; i < clientIndexer; i++){
             if(all_clients[i].ID == decider && checker == 0){
               checker = 1;
-              matches[0]->peer = all_clients[i];
+              matches[0].peer = &all_clients[i];
             }
             else if(checker == 1){
               cout<<"Game is Full"<<endl;
@@ -117,6 +118,10 @@ int main()
         toPoll[clientIndexer].events = POLLIN;
         clientIndexer++;
     }
+
+    //WIP
+    //Loop through all the polled clients and see if they are sending data
+    //Then send all the encoded bytes through to the matching client
     if(poll(toPoll, 1, 2500) == 0){
     cout<<"Poll Timed Out"<<endl;
     }
