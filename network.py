@@ -52,9 +52,9 @@ def look_for(sock, routines):
 def request_code_ret(j):
     return j["code"]
 def request_code(sock):
-    send_me = json.dumps({"msg":"request_code"}, sort_keys=True)
+    send_me = json.dumps({"msg":"request_code"})
     try:
-        sock.sendall(bytes(send_me,encoding = "ascii"))
+        sock.sendall(bytes(send_me, encoding = "ascii"))
     except socket.error:
         return -1
 
@@ -63,9 +63,9 @@ def request_code(sock):
 
 #sends code to server, returns -1 for socket error, 0 otherwise
 def send_code(sock, code):
-    send_me = json.dumps({"msg": "send_code" , "code": code}, sort_keys=True)
+    send_me = json.dumps({"msg": "send_code" , "code": code})
     try:
-        sock.sendall(bytes(send_me, encoding="ascii"))
+        sock.sendall(bytes(send_me, encoding = "ascii"))
         return 0
     except socket.error:
         return -1
@@ -91,16 +91,26 @@ def request_move(sock):
 
 #sends move to server, returns -1 if socket error, 0 if otherwise
 def send_move(sock, column):
-    send_me = json.dumps({"msg": "move", "column": column}, sort_keys=True)
+    send_me = json.dumps({"msg": "move", "column": column})
     try:
-        sock.sendall(bytes(send_me, encoding="ascii"))
+        sock.sendall(bytes(send_me, encoding = "ascii"))
         return 0
     except socket.error:
         return -1
 
+def echo_raw(sock):
+    while True:
+        try:
+            data = sock.recv(128)
+            print(data.decode(encoding = 'ascii'))
+        except socket.error:
+            return -1
 
 
+#status, sock = connect_server()
 
+#send_move(sock, 1)
+#echo_raw(sock)
 
 
 
