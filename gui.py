@@ -325,7 +325,7 @@ class network_config_gui:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_BACKSPACE:
                         code = code[:-1]
-                    if 49 <= event.key <= 55 and len(code) < 6:
+                    if 48 <= event.key <= 57 and len(code) < 6:
                         code = code + event.unicode
                     self.text_buttons[0].text = code
                     if len(code) == 6:

@@ -115,9 +115,6 @@ def network_failure():
     return
 
 def onlinePvP():
-
-    #intiialize socket connection to server
-
     #get config info from the config gui
     player_turn, connection_code = network_config_gui.get_config()
 
@@ -125,7 +122,7 @@ def onlinePvP():
     network_config_gui.draw_text_feedback("connecting to server...")
     network_config_gui.update_display()
 
-    #coneect to server
+    #conect to server
     status, sock = network.connect_server()
 
     #connection failed, inform user and prompt to return to menu
