@@ -1,9 +1,8 @@
 import pygame
-import random
-import os
 import ai
 import gui
 import gamelogic
+import network
 
 #initiate pygame
 pygame.init()
@@ -27,6 +26,8 @@ pygame.display.set_caption('Ultimate Connect 4')
 #initialize guis
 menu_gui = gui.menu_gui(display_surface, Xmax, Ymax)
 game_gui = gui.game_gui(display_surface, Xmax, Ymax)
+ai_config_gui = gui.ai_config_gui(display_surface, Xmax, Ymax)
+network_config_gui = gui.network_config_gui(display_surface, Xmax, Ymax)
 
 #most recent game list
 rewatch_list = []
@@ -38,12 +39,7 @@ rewatch_list = []
 # main loop, calls start menu to get an int indicating gamemode from the player then begins the chosen gamemode
 def main():
     #draw start menu
-
-    menu_gui.draw_buttons()
-    menu_gui.update_display()
-
     while (True):
-        menu_gui.update_display()
         choice = menu_gui.request_menu_choice()
         if (choice == 0):   localPvP()
         elif (choice == 1):   onlinePvP()
@@ -112,50 +108,35 @@ def localPvP():
 #online PvP#
 ############
 
-#TODO:
-#waits until response from server that indicates move, this will need to parse the raw byte data from the socket into a python int
-#args: os.socket socket
-#retun: int indicating column choice
-def request_move_online(socket):
-    return random.randrange(0,7,1)
-
-#TODO:
-#sends selected move to column, s
-#args: os.socket socket, int column
-def send_move_online(socket, column):
-    pass
-
-#TODO:
-#displays gui that allows user to configure network settings
-#args: TBD
-#return: int
-def online_config():
-    return 1, 11233213
-
-#TODO:
-#connects to server and initiates game
-def connect_server():
-    pass
-
 def onlinePvP():
 
     #intiialize socket connection to server
 
-
     # player -1 if player is hosting, n if player is connecting
-    connection_code = online_config()
-    player_turn = 0
-    if(connection_code == -1):
-        #request code from server
+    player_turn, connection_code = network_config_gui.get_config()
+
+    network_config_gui.draw_text_feedback("connecting to server...")
+    network_config_gui.update_display()
+
+    status, sock = network.connect_server()
+
+    if status == -1:
+        network_config_gui.draw_text_feedback("failed to connect, click anywhere to return to main menu")
+        network_config_gui.update_display()
+        gui.click_anywhere()
+        return
+
+    if(player_turn == 0):
+        network.request_code(sock)
         #recieve code from server
         #display code to GUI
         #redraw GUI
         pass
     else:
-        player_turn = 1
         #send connection code to server
         #display status to GUI
         #redraw GUI
+        pass
 
     #wait until game is started by server
 
@@ -188,10 +169,10 @@ def onlinePvP():
                 if (gamelogic.check_valid(board, selected_column) == False):
                     selected_column = -1
                 else:
-                    send_move_online(sock, selected_column)
+                    network.send_move(sock, selected_column)
 
             else:
-                selected_column = request_move_online(sock)
+                selected_column = network.request_move(sock)
 
         # add move to gameboard
         gamelogic.add_piece(board, selected_column, turn)
@@ -219,22 +200,10 @@ def onlinePvP():
 #AI gamemodes#
 ##############
 
-#args: [][] board, int difficulty
-#return: column of move chosen by AI
-'''
-    if(difficulty == 0):
-        return random.randrange(0,7,1)
-
-    # TODO:
-    # implement search algorithm
-    elif difficulty > 0:
-        return 1
-        '''
-# -----------------------------------------------------------
 def PvAI():
 
     #player turn == 0 means player is going first
-    #player_turn, ai_difficulty = ai_config_menu.get_config()
+    player_turn, ai_difficulty = ai_config_gui.get_config()
 
     # initialize game logic vars
     board = [[0] * 6 for i in range(7)]
@@ -270,6 +239,7 @@ def PvAI():
                 #if it is invalid then repeat
                 if(gamelogic.check_valid(board, selected_column) == False):
                     selected_column = -1
+
         elif (is_human == 1):
             while (selected_column == -1):
                 selected_column = ai.request_move_AI(board, 0, is_human)  # adjust difficulty
