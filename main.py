@@ -102,43 +102,58 @@ def localPvP():
     game_gui.update_display()
 
     #keep open till user decides to close
-    game_gui.request_move_player()
+    gui.click_anywhere()
 
 ############
 #online PvP#
 ############
 
+def network_failure():
+    network_config_gui.draw_text_feedback("network failure, click anywhere to return to main menu")
+    network_config_gui.update_display()
+    gui.click_anywhere()
+    return
+
 def onlinePvP():
 
     #intiialize socket connection to server
 
-    # player -1 if player is hosting, n if player is connecting
+    #get config info from the config gui
     player_turn, connection_code = network_config_gui.get_config()
 
+    #update gui
     network_config_gui.draw_text_feedback("connecting to server...")
     network_config_gui.update_display()
 
+    #coneect to server
     status, sock = network.connect_server()
 
-    if status == -1:
-        network_config_gui.draw_text_feedback("failed to connect, click anywhere to return to main menu")
-        network_config_gui.update_display()
-        gui.click_anywhere()
-        return
+    #connection failed, inform user and prompt to return to menu
+    if status == -1: network_failure(); return
 
+    #if we are hosting, host always goes first, request code from server
     if(player_turn == 0):
-        network.request_code(sock)
-        #recieve code from server
-        #display code to GUI
-        #redraw GUI
-        pass
-    else:
-        #send connection code to server
-        #display status to GUI
-        #redraw GUI
-        pass
+        network_config_gui.draw_text_feedback("requesting code...")
+        network_config_gui.update_display()
 
-    #wait until game is started by server
+        code = network.request_code(sock)
+        if code == -1: network_failure(); return
+
+        network_config_gui.draw_text_feedback("recieved code")
+        network_config_gui.update_display()
+
+        network_config_gui.draw_text_host(str(code))
+        network_config_gui.update_display()
+    #if we are connecting, send code to server
+    else:
+        ret = network.send_code(sock, connection_code)
+        if ret == -1: network_failure(); return
+
+        network_config_gui.draw_text_feedback("sent code, waiting for return...")
+        network_config_gui.update_display()
+
+    ret = network.wait_start()
+    if ret == -1: network_failure(); return
 
     # initialize game logic vars
     board = [[0] * 6 for i in range(7)]
@@ -169,10 +184,12 @@ def onlinePvP():
                 if (gamelogic.check_valid(board, selected_column) == False):
                     selected_column = -1
                 else:
-                    network.send_move(sock, selected_column)
+                    ret = network.send_move(sock, selected_column)
+                    if ret == -1: network_failure(); return
 
             else:
                 selected_column = network.request_move(sock)
+                if selected_column == -1: network_failure(); return
 
         # add move to gameboard
         gamelogic.add_piece(board, selected_column, turn)
@@ -194,7 +211,7 @@ def onlinePvP():
     game_gui.update_display()
 
     # keep open till user decides to close
-    game_gui.request_move_player()
+    gui.click_anywhere()
 
 ##############
 #AI gamemodes#
@@ -267,7 +284,7 @@ def PvAI():
     game_gui.update_display()
 
     #keep open till user decides to close
-    game_gui.request_move_player()
+    gui.click_anywhere()
 
 
 def AIvAI():
@@ -278,6 +295,12 @@ def AIvAI():
 ##################
 
 def rewatch():
+    if len(rewatch_list) == 0:
+        game_gui.draw_text("no game to rewatch, click anywhere to return to menu")
+        game_gui.update_display()
+        gui.click_anywhere()
+        return
+
     # initialize game logic vars
     board = [[0] * 6 for i in range(7)]
     turn = 0
@@ -313,7 +336,7 @@ def rewatch():
     game_gui.update_display()
 
     # keep open till user decides to close
-    game_gui.request_move_player()
+    gui.click_anywhere()
 
 if __name__ == '__main__':
     main()
