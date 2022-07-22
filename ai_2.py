@@ -52,11 +52,12 @@ def minimax(board, depth, turn, alpha, beta, maximizing): # turn = AI retruns th
                     curr_score=new_score
                     final_col=column
 
-
+                """
                 #alpha-beta pruning:
                 alpha = max(alpha,curr_score)
                 if alpha >= beta:
                     break
+                """
             column += 1
         return (final_col,curr_score)
 
@@ -75,10 +76,12 @@ def minimax(board, depth, turn, alpha, beta, maximizing): # turn = AI retruns th
                     curr_score = new_score
                     final_col = column
 
+                """
                 # alpha-beta pruning:
                 beta=min(beta,curr_score)
                 if alpha >= beta:
                     break
+                """
             column += 1
         return (final_col, curr_score)
 
@@ -86,6 +89,7 @@ def request_move_AI(board, difficulty, turn):
     if difficulty==0:
         return random.randrange(0,7,1)
     difficulty = difficulty * 2
+    if difficulty > 6: difficulty = difficulty - 1
     value = minimax(board,difficulty,turn,-math.inf,math.inf,True)[0]
     return value
     print("Difficulty initialization Error")

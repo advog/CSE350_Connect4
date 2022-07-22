@@ -234,20 +234,16 @@ def PvAI():
     while (winner == -1):
 
         # update textbox
-        is_human = turn % 2 #whose turn is it 1 = player/human, 1 = AI
-        player_string = "Player's Move"
-        ai_string = "AI's Move"
-        if(is_human == 0):
-            game_gui.draw_text(player_string)
-        elif(is_human == 1):
-            game_gui.draw_text(ai_string)
+        # update textbox
+        player_string = "Player " + str((turn) % 2 + 1) + "'s Move"
+        game_gui.draw_text(player_string)
         game_gui.draw_board(board)
         game_gui.update_display()
 
         #loop until a valid column is selected
         selected_column = -1
 
-        if (is_human == 0):  #if its a humna/player
+        if (turn %2 == player_turn):  #if its a humna/player
             while (selected_column == -1):
 
                 #seed control to game_gui until player provides move
@@ -257,12 +253,8 @@ def PvAI():
                 if(gamelogic.check_valid(board, selected_column) == False):
                     selected_column = -1
 
-        elif (is_human == 1):
-            while (selected_column == -1):
-                selected_column = ai_2.request_move_AI(board, ai_difficulty, is_human)  # adjust difficulty #-=============================================================================
-                #print(selected_column)
-                if(gamelogic.check_valid(board, selected_column) == False):
-                    selected_column = -1
+        else:
+            selected_column = ai_2.request_move_AI(board, ai_difficulty, turn)  # adjust difficulty #-===
 
         #add move to gameboard
         gamelogic.add_piece(board, selected_column, turn)
