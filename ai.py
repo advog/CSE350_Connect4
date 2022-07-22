@@ -24,7 +24,9 @@ def max(board, depth, AI): # turn = AI retruns the max value to the min function
   global recursion 
   score_max = [0] * columns
   # create 7 different boards and add a AI piece to each column
-  new_board = [board] * columns
+  new_board = []
+  for i in range(columns):
+      new_board.append(board.copy())
   column = 0
   for item in new_board:
     if(gamelogic.check_valid(item, column)):
@@ -61,7 +63,10 @@ def max(board, depth, AI): # turn = AI retruns the max value to the min function
 def min(board, depth, player): # turn = player returns the min value to the max function
     global recursion
     score_min = [0] * columns
-    new_board = [board for i in range(columns)]
+    #new_board = [board for i in range(columns)]
+    new_board = []
+    for i in range(columns):
+        new_board.append(board.copy())
     column = 0
     for item in new_board:
         if(gamelogic.check_valid(item, column)):

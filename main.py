@@ -3,6 +3,7 @@ import ai
 import gui
 import gamelogic
 import network
+import ai_2
 
 #initiate pygame
 pygame.init()
@@ -256,8 +257,8 @@ def PvAI():
 
         elif (is_human == 1):
             while (selected_column == -1):
-                selected_column = ai.request_move_AI(board, 0, is_human)  # adjust difficulty
-                print(selected_column)
+                selected_column = ai_2.request_move_AI(board, ai_difficulty, is_human)  # adjust difficulty #-=============================================================================
+                #print(selected_column)
                 if(gamelogic.check_valid(board, selected_column) == False):
                     selected_column = -1
 
