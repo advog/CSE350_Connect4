@@ -6,165 +6,175 @@
 #include <netinet/in.h>
 #include <poll.h>
 #include <stdlib.h>
-#include <json.h>
+#include <cstddef>
+#include <cassert>
+#include <fcntl.h>
+#include "json.h"
 
 #define MAX_CLIENTS 128
 #define PORT 42069
 
 using namespace std;
 
-//client structure for easier mem management
+//match structure for easier mem management
 struct client{
-  int socket;
-  bytes buffer[128] = {0};
+  int *fd;
+  unsigned char buffer[128] = {0};
   int timeout = 25;
-  int matchID;
-  bool is_host;
 };
 
 struct match{
-  client *host;
-  client *peer;
+  client host;
+  client peer;
+  int ID;
+  bool isFull = 0;
 };
 
-//grabs the socket from the ID
-int get_ID_from_socket(int *sock, client *active, int num_clients){
-  for(int i = 0; i < num_clients; i++){
-    if(active[i]->socket == sock){
-      return active[i]->matchID;
-    }
-  }
-  return -1;
+//grabs matchid from the socket
+client *find_match(int *sock, match *running, int num_matches){
+      for(int i=0; i < num_matches; i++){
+        if(running[i].host.fd == sock)
+          return &running[i].peer;
+        else if(running[i].peer.fd == sock){
+          return &running[i].host;
+        }
+      }
+  return NULL;
 };
 
-string recieve_json(client *read){
+string recieve_json(int *to_read, unsigned char buffer[128]){
   string rcv = "";
-  ssize_t size;
-  while(size = recv(read->socket, read->buffer, 128, 0)){
-    rcv += (string)(read->buffer);
+  int size;
+  while((size = recv(*to_read, buffer, 128, 0)) > 0){
+    rcv = rcv + (char *)(buffer);
   }
   return rcv;
 }
 
 string read_msg_ret(struct json_value_s* root){
   struct json_object_s* object = json_value_as_object(root);
-  assert(object != NULL);
-  assert(object->length == 2);
 
   struct json_object_element_s* m = object->start;
 
   struct json_value_s* msg = m->value;
 
-  string buffer = json_value_as_string(msg);
+  string buffer = (char *)json_value_as_string(msg);
   free(object);
   return buffer;
 }
 
-int read_code_ret(struct json_value_s* root){
+int *read_code_ret(struct json_value_s* root){
   struct json_object_s* object = json_value_as_object(root);
-  assert(object != NULL);
-  assert(object->length == 2);
 
   struct json_object_element_s* m = object->start;
   struct json_object_element_s* c = m->next;
 
   struct json_value_s* msg = c->value;
 
-  int buffer = json_value_as_int(value);
+  int *buffer = (int *)json_value_as_number(msg);
   free(object);
   return buffer;
+}
+
+int get_cnt_from_ID(int ID, match *running, int num_matches){
+  for(int i = 0; i < num_matches; i++)
+    if (running[i].ID == ID)
+      return i;
+  return -1;
 }
 
 //main server loop
 int main(){
 
-  //instantiate indexers
-  int clientIndexer = 0;
-  int matchIndexer = 0;
-  int ID_indexer = 0;
-  int opt = 1;
-  int decider;
-
-  //define arrays using structs
-  client all_clients[MAX_CLIENTS];
+  //alloc memory for arrays
+  struct pollfd toPoll[MAX_CLIENTS+1];
   match matches[MAX_CLIENTS/2];
+
+  //instantiate random vars (this is why i like python)
+  int match_cnt = 0;
+  int sock_cnt = 1;
+  int opt = 1;
+  string decider;
+  struct json_value_s* checker;
+  int addto;
+  unsigned char* temp_buff;
+  //address
   struct sockaddr_in address;
   int addrlen = sizeof(address);
 
+
   //instantiate listener socket
   cout<<"Attempting Socket Connections..."<<endl<<endl;
-  int listener = socket(AF_INET, SOCK_STREAM, 0);
-  if(listener == -1){
+  toPoll[0].fd = socket(AF_INET, SOCK_STREAM, 0);
+  int *listener = &toPoll[0].fd;
+
+  if(*listener == -1){
     cout<<"Socket Creation not Successful"<<endl;
     exit(1);
   }
   cout<<"Socket Creation was Successful"<<endl;
 
   //intiialize additional socket paramaters
-  setsockopt(listener, SOL_SOCKET, SO_REUSEADDR|SO_REUSEPORT, &opt, sizeof(opt));
+  setsockopt(*listener, SOL_SOCKET, SO_REUSEADDR|SO_REUSEPORT, &opt, sizeof(opt));
+  fcntl(*listener, F_SETFL, O_NONBLOCK);
   address.sin_family = AF_INET;
   address.sin_addr.s_addr = INADDR_ANY;
   address.sin_port = htons(PORT);
 
   //initialize polling
-  struct pollfd toPoll[MAX_CLIENTS];
+
 
   //bind the listener to the port (very nicely)
-  int testBind = bind(listener,(struct sockaddr *)&address,addrlen);
+  int testBind = bind(*listener,(struct sockaddr *)&address,addrlen);
   if(testBind == -1){
     cout<<"Binding to Port "<<PORT<<" Failed"<<endl;
     exit(1);
   }
   cout<<"Binding to Port "<<PORT<<" Successful"<<endl;
 
+
+
   //server loop
   bool shutdown = 0;
   while(shutdown == 0){
     //start listening
-    listen(listener, 4);
+    listen(*listener, 4);
 
     //accept incoming connections
-    while ((all_clients[clientIndexer].socket = accept(listener,(struct sockaddr*)&address, (socklen_t*)&addrlen))  <  0){
+    while ((toPoll[sock_cnt].fd = accept(*listener,(struct sockaddr*)&address, (socklen_t*)&addrlen))  <  0){
         //decide if host or peer and assign appropriately
-        struct json_value_s* checker = jsonparse(recieve_json(&all_clients[clientIndexer]), 1024);
+        checker = json_parse(recieve_json(&toPoll[sock_cnt].fd, temp_buff), 1024);
         decider = read_msg_ret(checker);
-
 
         //assigns a new ID using the indexer if the new client is the host
         if(decider == "request_code"){
-          matches[ID_indexer]->host = &all_clients[clientIndexer];
-          matches[ID_indexer]->host.matchID = ID_indexer;
-          matches[ID_indexer]->host.is_host = 1;
-          ID_indexer++;
+          matches[match_cnt].host.fd = &toPoll[sock_cnt].fd;
+          match_cnt++;
         }
 
 
         //assigns the ID submitted if the new client is the peer and the match is not already full
         else if(decider == "send_code"){
-          for(int i = 0; i < clientIndexer; i++){
-            bool isFull = 0; //need function here
-            int addto = read_code_ret(checker) && !isFull);
-            matches[addto]->peer = &all_clients[i];
-            matches[addto]->host.matchID = ID_indexer;
-            matches[addto]->host.is_host = 0;
+          for(int i = 0; i < match_cnt; i++){
+            addto = *read_code_ret(checker);
+            matches[get_cnt_from_ID(addto, matches, match_cnt)].peer.fd = &toPoll[i].fd;
           }
         }
-        else if(isFull){
+        else {
           cout<<"Game is Full"<<endl;
           }
 
 
-        else{
-          cout<<"Critical Error..."<<endl<<"Aborting"<<endl;
-          exit(1);
-        }
+      //  else{
+      //    cout<<"Critical Error..."<<endl<<"Aborting"<<endl;
+      //    exit(1);
+      //  }
 
         free(checker);
-
+        toPoll[sock_cnt].events = POLLIN;
+        sock_cnt++;
         //add the socket to polling
-        toPoll[clientIndexer].fd = &clients[clientIndexer].socket;
-        toPoll[clientIndexer].events = POLLIN;
-        clientIndexer++;
+
       }
 
     //WIP
@@ -173,25 +183,37 @@ int main(){
     if(poll(toPoll, 1, 100) == 0)
       cout<<"Poll Timed Out"<<endl;
     else{
-      for(int i = 0; i < clientIndexer; i++)
+      for(int i = 1; i < sock_cnt; i++)
         //if polled event. needs syntax update
         if(toPoll[i].revents != 0){
-          struct json_value_s* recieved = jsonparse(recieve_json(&toPoll[i]), 1024);
-          if(matches[get_ID_from_socket(toPoll[i].socket)]->is_host){
+          client *temp_peer, *temp_host;
+          temp_peer = find_match(&toPoll[i].fd, matches, match_cnt);
+          temp_host = find_match(temp_peer->fd, matches, match_cnt);
+          string raw = recieve_json(temp_host->fd, temp_host->buffer);
+          checker = json_parse(&raw, 1024);
+
+
             //check for msg type
-            decider = read_msg_ret(recieved);
+          decider = read_msg_ret(checker);
 
-            if(decider == "move"){
-              //send read_code_ret
-            }
+          //send move
+          if(decider == "move"){
+            unsigned char toSend[raw.length()];
+            memcpy(toSend, raw.data(), raw.length());
+            send(*temp_peer->fd, toSend, raw.length(), 0);
+          }
 
-            if(read_msg_ret(recieved))
-
-
-            //send buffer
-
+          //shutoff
+          if(decider == ""){
+            //free match and clients from memory
 
           }
+
+
+
+
+
         }
+      }
     }
 };
