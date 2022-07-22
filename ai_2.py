@@ -24,7 +24,7 @@ def minimax(board, depth, turn, alpha, beta, maximizing): # turn = AI retruns th
     if gamelogic.check_win(board,player)==player: #win for us
         return (None,1e10)
     if gamelogic.check_win(board,opp_player)==opp_player: #win for them
-        return (None,1e-10)
+        return (None,-1e10)
     if sum(x.count(0) for x in board)==0: #tie
         return (None,0)
 
@@ -85,6 +85,7 @@ def minimax(board, depth, turn, alpha, beta, maximizing): # turn = AI retruns th
 def request_move_AI(board, difficulty, turn):
     if difficulty==0:
         return random.randrange(0,7,1)
+    difficulty = difficulty * 2
     value = minimax(board,difficulty,turn,-math.inf,math.inf,True)[0]
     return value
     print("Difficulty initialization Error")

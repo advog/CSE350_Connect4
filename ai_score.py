@@ -19,12 +19,14 @@ def evaluate_window(window, turn):
         score += 100
     elif window.count(player) == 3 and window.count(EMPTY) == 1:
         score += 5
-    elif window.count(player) == 2 and window.count(EMPTY) == 2:
-        score += 2
+    #elif window.count(player) == 2 and window.count(EMPTY) == 2:
+     #   score += 2
 
     # avoid situations where the opponent is close to winning
     if window.count(opp_player) == 3 and window.count(EMPTY) == 1:
-        score -= 4
+        score -= 5
+    if window.count(opp_player) == 4:
+        score -= 100
 
     return score
 #-------------------------------------------------------
