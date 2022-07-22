@@ -4,6 +4,7 @@ import gui
 import gamelogic
 import network
 import ai_2
+import random
 
 #initiate pygame
 pygame.init()
@@ -28,6 +29,7 @@ pygame.display.set_caption('Ultimate Connect 4')
 menu_gui = gui.menu_gui(display_surface, Xmax, Ymax)
 game_gui = gui.game_gui(display_surface, Xmax, Ymax)
 ai_config_gui = gui.ai_config_gui(display_surface, Xmax, Ymax)
+aivai_config_gui = gui.aivai_config_gui(display_surface, Xmax, Ymax)
 network_config_gui = gui.network_config_gui(display_surface, Xmax, Ymax)
 
 #most recent game list
@@ -286,7 +288,66 @@ def PvAI():
 
 
 def AIvAI():
-    print('aivai')
+    ai_difficulty = aivai_config_gui.get_config()
+
+    # initialize game logic vars
+    board = [[0] * 6 for i in range(7)]
+    turn = 0
+
+    # empty rewatch list
+    rewatch_list.clear()
+
+    # loop untill there is a winner/tie
+    winner = -1  # 0 = tie, 1 = player 1, 2 = player 2
+    while (winner == -1):
+
+        # update textbox
+        curr_turn = turn % 2  # whose turn is it 1 = player/human, 1 = AI
+        player1_string = "Player 1's Move"
+        player2_string = "Player 2's Move"
+        if (curr_turn == 0):
+            game_gui.draw_text(player1_string)
+        elif (curr_turn == 1):
+            game_gui.draw_text(player2_string)
+        game_gui.draw_board(board)
+        game_gui.update_display()
+
+        #wait a second
+        pygame.time.delay(1000)
+
+        # loop until a valid column is selected
+        selected_column = -1
+        while (selected_column == -1):
+            #randomize first move
+            if turn==0:
+                selected_column = random.randrange(0,7,1)
+            else:
+                selected_column = ai_2.request_move_AI(board, ai_difficulty,curr_turn)
+            # print(selected_column)
+            if (gamelogic.check_valid(board, selected_column) == False):
+                selected_column = -1
+
+        # add move to gameboard
+        gamelogic.add_piece(board, selected_column, turn)
+
+        # add move to rewatch list
+        rewatch_list.append(selected_column)
+
+        # increment turn
+        turn = turn + 1
+
+        # check for winner
+        winner = gamelogic.check_win(board, turn)
+
+    # display who won
+    winner_string = "Player " + str(winner) + " Wins!"
+    if (winner == 0): winner_string = "TIE!"
+    game_gui.draw_text(winner_string)
+    game_gui.draw_board(board)
+    game_gui.update_display()
+
+    # keep open till user decides to close
+    gui.click_anywhere()
 
 ##################
 #rewatch gamemode#

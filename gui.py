@@ -248,6 +248,77 @@ class ai_config_gui:
                     pygame.quit()
                     quit()
 
+#ai v ai config menu
+class aivai_config_gui:
+    def __init__(self, display_surface, width, height):
+        self.width = width
+        self.height = height
+        self.display_surface = display_surface
+        self.level = 3
+        self.turn = 0
+
+        # init the surface
+        self.ai_config_surface = pygame.Surface((self.width, self.height))
+        self.ai_config_surface.fill(menu_color)
+
+        # add level_buttons
+        self.level_buttons = []
+        random_button = button.click_button((self.width / 12, self.height * (3 / 8)), (240, 50), button_color, "Random",
+                                            self.ai_config_surface)
+        self.level_buttons.append(random_button)
+        easy_button = button.click_button((self.width / 12, self.height * (3 / 8) + 60), (240, 50), button_color,
+                                          "Easy", self.ai_config_surface)
+        self.level_buttons.append(easy_button)
+        hard_button = button.click_button((self.width / 12, self.height * (3 / 8) + 120), (240, 50), button_color,
+                                          "Hard", self.ai_config_surface)
+        self.level_buttons.append(hard_button)
+        impossible_button = button.click_button((self.width / 12, self.height * (3 / 8) + 180), (240, 50),
+                                                pressed_button_color, "Impossible", self.ai_config_surface)
+        self.level_buttons.append(impossible_button)
+
+        # create confirm button
+        self.confirm_button = button.click_button((self.width / 12 + 270, self.height * (3 / 8)), (240, 230),
+                                                  white_color, "Confirm", self.ai_config_surface)
+
+    def draw_buttons(self):
+        for b in self.level_buttons:
+            b.draw()
+        self.confirm_button.draw()
+
+    def update_display(self):
+        self.display_surface.blit(self.ai_config_surface, (0, 0))
+        pygame.display.flip()
+
+    # seeds control of program to event loop
+    # returns player_turn and ai_difficulty
+    def get_config(self):
+        self.draw_buttons()
+        self.update_display()
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    pos = pygame.mouse.get_pos()
+
+                    if self.confirm_button.check_clicked(pos) == True:
+                        return self.level
+
+                    # if a level button is clicked then update GUI and member variable
+                    clicked_index = check_clicked(self.level_buttons, pos)
+                    if clicked_index != -1:
+                        self.level_buttons[self.level].change_color(button_color)
+                        self.level_buttons[clicked_index].change_color(pressed_button_color)
+                        self.level = clicked_index
+
+                    # update display
+                    self.draw_buttons()
+                    self.update_display()
+
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+
+
 
 ####################
 #network config GUI#
