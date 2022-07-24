@@ -152,7 +152,9 @@ def onlinePvP():
         network_config_gui.draw_text_feedback("sent code, waiting for return...")
         network_config_gui.update_display()
 
-    ret = network.wait_start()
+    print("waiting for start")
+
+    ret = network.wait_start(sock)
     if ret == -1: network_failure(); return
 
     # initialize game logic vars
@@ -161,6 +163,8 @@ def onlinePvP():
 
     # empty rewatch list
     rewatch_list.clear()
+
+    print("starting game")
 
     # loop until there is a winner/tie
     winner = -1  # 0 = tie, 1 = player 1, 2 = player 2

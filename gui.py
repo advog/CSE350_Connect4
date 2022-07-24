@@ -391,7 +391,7 @@ class network_config_gui:
                         if clicked_index == 0:
                             return (0, "")
                         elif clicked_index == 1 and code_entered == True:
-                            return (1, code)
+                            return (1, int(code))
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_BACKSPACE:

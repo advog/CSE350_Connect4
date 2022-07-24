@@ -1,9 +1,10 @@
 import random
 import socket
 import json
+import time
 
-HOST = "127.0.0.1"  # The server's hostname or IP address
-PORT = 65432  # The port used by the server
+HOST = "192.168.0.119"  # The server's hostname or IP address
+PORT = 5007  # The port used by the server
 
 rcv = ""
 
@@ -43,10 +44,14 @@ def look_for(sock, routines):
                     offset = i+1
         rcv = rcv[offset:]
 
+        print(completed)
+
         for j in completed:
             for r in routines:
                 if j["msg"] == r[0]:
                     return r[1](j)
+
+        time.sleep(0.1)
 
 #sends request for code to server, returns -1 for error, returned code otherwise
 def request_code_ret(j):
@@ -58,7 +63,7 @@ def request_code(sock):
     except socket.error:
         return -1
 
-    routines = [("request_code", request_code_ret)]
+    routines = [("send_code", request_code_ret)]
     return look_for(sock, routines)
 
 #sends code to server, returns -1 for socket error, 0 otherwise
@@ -82,10 +87,10 @@ def wait_start(sock):
     return look_for(sock, routines)
 
 #waits for move to be sent by server, returns -1 if timeout, column otherwise
-def request_mov_ret(j):
+def request_move_ret(j):
     return j["column"]
 def request_move(sock):
-    routines = [("start", wait_start_ret), ("disconnect", disconnect_ret)]
+    routines = [("move", request_move_ret), ("disconnect", disconnect_ret)]
     return look_for(sock, routines)
 
 
