@@ -1,3 +1,6 @@
+import os
+import socket
+
 import pygame
 import ai
 import gui
@@ -214,6 +217,8 @@ def onlinePvP():
     game_gui.draw_board(board)
     game_gui.update_display()
 
+    # close socket
+    sock.close()
     # keep open till user decides to close
     gui.click_anywhere()
 

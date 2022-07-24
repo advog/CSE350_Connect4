@@ -1,0 +1,3 @@
+/home/andrewvog/Code/contingency/CMakeFiles/contingency.dir
+/home/andrewvog/Code/contingency/CMakeFiles/edit_cache.dir
+/home/andrewvog/Code/contingency/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/contingency.dir/src/connect4_server.cpp.o -o contingency 
