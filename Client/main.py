@@ -1,8 +1,4 @@
-import os
-import socket
-
 import pygame
-import ai
 import gui
 import gamelogic
 import network
@@ -323,7 +319,7 @@ def AIvAI():
             if turn==0:
                 selected_column = random.randrange(0,7,1)
             else:
-                selected_column = ai_2.request_move_AI(board, ai_difficulty,curr_turn)
+                selected_column = ai_2.request_move_AI(board, ai_difficulty, curr_turn)
             # print(selected_column)
             if (gamelogic.check_valid(board, selected_column) == False):
                 selected_column = -1

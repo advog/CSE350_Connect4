@@ -20,10 +20,10 @@ def minimax(board, depth, turn, alpha, beta, maximizing): # turn = AI retruns th
 
     #base cases for recursion
     if depth==0:#end recursion
-        return(None, ai_score.score_position(board,turn))
-    if gamelogic.check_win(board,player)==player: #win for us
+        return(None, ai_score.score_position(board, turn))
+    if gamelogic.check_win(board, player)==player: #win for us
         return (None,1e10)
-    if gamelogic.check_win(board,opp_player)==opp_player: #win for them
+    if gamelogic.check_win(board, opp_player)==opp_player: #win for them
         return (None,-1e10)
     if sum(x.count(0) for x in board)==0: #tie
         return (None,0)
@@ -45,7 +45,7 @@ def minimax(board, depth, turn, alpha, beta, maximizing): # turn = AI retruns th
             if (gamelogic.check_valid(item, column)):
 
                 #create possible board and score
-                gamelogic.add_piece(item,column, player)
+                gamelogic.add_piece(item, column, player)
                 new_score = minimax(item,depth-1,player, alpha, beta, False)[1]
 
                 if(new_score>curr_score):

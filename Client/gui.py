@@ -50,7 +50,7 @@ class game_gui:
         # add buttons to game_surface
         self.column_buttons = []
         for i in range(7):
-            tmp_button = button.invisible_button((self.block_width * i, self.block_height), (self.block_width, self.block_width*6))
+            tmp_button = button.invisible_button((self.block_width * i, self.block_height), (self.block_width, self.block_width * 6))
             self.column_buttons.append(tmp_button)
 
         # add textbox to game_surface (it is technically a click button but we just will never check if it is clicked)
@@ -122,15 +122,15 @@ class menu_gui:
 
         # add buttons to menu_surface
         self.menu_buttons = []
-        lpvp_button = button.click_button((self.width / 2 - 130, self.height*(5/7)), (120, 50), button_color, "Local PvP", self.menu_surface)
+        lpvp_button = button.click_button((self.width / 2 - 130, self.height * (5 / 7)), (120, 50), button_color, "Local PvP", self.menu_surface)
         self.menu_buttons.append(lpvp_button)
-        opvp_button = button.click_button((self.width / 2 + 10, self.height*(5/7)), (120, 50), button_color, "Online PvP", self.menu_surface)
+        opvp_button = button.click_button((self.width / 2 + 10, self.height * (5 / 7)), (120, 50), button_color, "Online PvP", self.menu_surface)
         self.menu_buttons.append(opvp_button)
-        aivp_button = button.click_button((self.width / 2 - 130, self.height*(5/7)+ 60), (120, 50), button_color, "PvAI", self.menu_surface)
+        aivp_button = button.click_button((self.width / 2 - 130, self.height * (5 / 7) + 60), (120, 50), button_color, "PvAI", self.menu_surface)
         self.menu_buttons.append(aivp_button)
-        aivai_button = button.click_button((self.width / 2 + 10, self.height*(5/7)+ 60), (120, 50), button_color, "AIvAI", self.menu_surface)
+        aivai_button = button.click_button((self.width / 2 + 10, self.height * (5 / 7) + 60), (120, 50), button_color, "AIvAI", self.menu_surface)
         self.menu_buttons.append(aivai_button)
-        rewatch_button = button.click_button((self.width / 2 - 60, self.height*(5/7)+ 120), (120, 50), button_color, "Rewatch", self.menu_surface)
+        rewatch_button = button.click_button((self.width / 2 - 60, self.height * (5 / 7) + 120), (120, 50), button_color, "Rewatch", self.menu_surface)
         self.menu_buttons.append(rewatch_button)
 
         # map for readability
@@ -182,24 +182,24 @@ class ai_config_gui:
 
         # add level_buttons
         self.level_buttons = []
-        random_button = button.click_button((self.width / 12, self.height*(3/8)), (240, 50), button_color, "Random", self.ai_config_surface)
+        random_button = button.click_button((self.width / 12, self.height * (3 / 8)), (240, 50), button_color, "Random", self.ai_config_surface)
         self.level_buttons.append(random_button)
-        easy_button = button.click_button((self.width / 12, self.height*(3/8)+ 60), (240, 50), button_color, "Easy", self.ai_config_surface)
+        easy_button = button.click_button((self.width / 12, self.height * (3 / 8) + 60), (240, 50), button_color, "Easy", self.ai_config_surface)
         self.level_buttons.append(easy_button)
-        hard_button = button.click_button((self.width / 12, self.height*(3/8)+ 120), (240, 50), button_color, "Hard", self.ai_config_surface)
+        hard_button = button.click_button((self.width / 12, self.height * (3 / 8) + 120), (240, 50), button_color, "Hard", self.ai_config_surface)
         self.level_buttons.append(hard_button)
-        impossible_button = button.click_button((self.width / 12, self.height*(3/8)+ 180), (240, 50), pressed_button_color, "Impossible", self.ai_config_surface)
+        impossible_button = button.click_button((self.width / 12, self.height * (3 / 8) + 180), (240, 50), pressed_button_color, "Impossible", self.ai_config_surface)
         self.level_buttons.append(impossible_button)
 
         #add turn_buttons
         self.turn_buttons = []
-        player_first_button = button.click_button((self.width / 12, self.height*(1/8)), (240, 50), pressed_button_color, "Player Goes First", self.ai_config_surface)
+        player_first_button = button.click_button((self.width / 12, self.height * (1 / 8)), (240, 50), pressed_button_color, "Player Goes First", self.ai_config_surface)
         self.turn_buttons.append(player_first_button)
-        ai_first_button = button.click_button((self.width / 12 + 270, self.height*(1/8)), (240, 50), button_color, "AI Goes First", self.ai_config_surface)
+        ai_first_button = button.click_button((self.width / 12 + 270, self.height * (1 / 8)), (240, 50), button_color, "AI Goes First", self.ai_config_surface)
         self.turn_buttons.append(ai_first_button)
         
         #create confirm button
-        self.confirm_button = button.click_button((self.width / 12 + 270, self.height*(3/8)), (240, 230), white_color, "Confirm", self.ai_config_surface)
+        self.confirm_button = button.click_button((self.width / 12 + 270, self.height * (3 / 8)), (240, 230), white_color, "Confirm", self.ai_config_surface)
 
     def draw_buttons(self):
         for b in self.level_buttons:
@@ -338,13 +338,13 @@ class network_config_gui:
         self.text_buttons = []
         connect_textbox_button = button.click_button((self.width / 2 - 250, self.height * (5 / 7)), (200, 50), button_color, "", self.menu_surface)
         self.text_buttons.append(connect_textbox_button)
-        host_textbox_button = button.click_button((self.width / 2 - 250, self.height * (5 / 7) + 60), (200, 50), button_color,"", self.menu_surface)
+        host_textbox_button = button.click_button((self.width / 2 - 250, self.height * (5 / 7) + 60), (200, 50), button_color, "", self.menu_surface)
         self.text_buttons.append(host_textbox_button)
-        feedback_button = button.click_button((self.width / 2 - 250, self.height * (5 / 7) + 120), (500, 50),button_color, "Feedback", self.menu_surface)
+        feedback_button = button.click_button((self.width / 2 - 250, self.height * (5 / 7) + 120), (500, 50), button_color, "Feedback", self.menu_surface)
         self.text_buttons.append(feedback_button)
 
         self.menu_buttons = []
-        host_button = button.click_button((self.width / 2 -40, self.height * (5 / 7) + 60), (290, 50), button_color,"Generate Host Code", self.menu_surface)
+        host_button = button.click_button((self.width / 2 - 40, self.height * (5 / 7) + 60), (290, 50), button_color, "Generate Host Code", self.menu_surface)
         self.menu_buttons.append(host_button)
         connect_game_button = button.click_button((self.width / 2 - 40, self.height * (5 / 7)), (290, 50), button_color, "Connect to Game", self.menu_surface)
         self.menu_buttons.append(connect_game_button)
